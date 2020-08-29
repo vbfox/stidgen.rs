@@ -9,5 +9,13 @@ fn main() {
     let idstr2 = FooId::new("Baz");
     let s: String = idstr2.into();
 
-    println!("{}, {:?}, {}, {}, {}, {}", id, id, id.as_str(), id.to_string(), idstr.into_string(), s);
+    println!(
+        "{}, {:?}, {}, {}, {}, {}",
+        id,
+        id,
+        id.as_str(),
+        id.to_string(),
+        idstr.into_string(),
+        s
+    );
 }
