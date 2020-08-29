@@ -41,6 +41,18 @@ fn impl_string_id(_attr_ast: &syn::AttributeArgs, item_ast: &syn::ItemStruct) ->
                 self.0.fmt(f)
             }
         }
+
+        impl std::borrow::Borrow<str> for #name {
+            fn borrow(&self) -> &str {
+                &self.0
+            }
+        }
+
+        impl std::convert::AsRef<str> for #name {
+            fn as_ref(&self) -> &str {
+                &self.0
+            }
+        }
     };
 
     TokenStream::from(gen)
