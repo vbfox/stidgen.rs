@@ -1,13 +1,11 @@
-use stidgen::string_id;
 use std::borrow::Borrow;
 use std::convert::AsRef;
+use stidgen::string_id;
 
 #[string_id]
 struct FooId(String);
 
-fn with_str(_s: &str) {
-
-}
+fn with_str(_s: &str) {}
 
 fn main() {
     let id = FooId::new("Foo");
