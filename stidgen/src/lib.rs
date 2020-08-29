@@ -1,3 +1,5 @@
+#![allow(clippy::ptr_arg)]
+
 extern crate proc_macro;
 
 use proc_macro::TokenStream;
