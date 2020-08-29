@@ -4,7 +4,6 @@
 name = "playground"
 version = "0.1.0"
 dependencies = [
- "stidgen",
  "stidgen_derive",
 ]
 
@@ -25,10 +24,6 @@ checksum = "aa563d17ecb180e500da1cfd2b028310ac758de548efdd203e18f283af693f37"
 dependencies = [
  "proc-macro2",
 ]
-
-[[package]]
-name = "stidgen"
-version = "0.1.0"
 
 [[package]]
 name = "stidgen_derive"

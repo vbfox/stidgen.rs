@@ -1,15 +1,13 @@
-use stidgen::HelloMacro;
-use stidgen_derive::HelloMacro;
+use stidgen_derive::string_id;
 
-#[derive(HelloMacro)]
-struct Pancakes;
-
-/*
-impl HelloMacro for Pancakes {
-    fn hello_macro() {
-    }
-}*/
+#[string_id]
+struct FooId(String);
 
 fn main() {
-    Pancakes::hello_macro();
+    let id = FooId::new("Foo");
+    let idstr = FooId::new("Bar");
+    let idstr2 = FooId::new("Baz");
+    let s: String = idstr2.into();
+
+    println!("{}, {:?}, {}, {}, {}, {}", id, id, id.as_str(), id.to_string(), idstr.into_string(), s);
 }
