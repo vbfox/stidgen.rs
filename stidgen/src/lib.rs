@@ -9,7 +9,7 @@ use syn::{self, parse_macro_input};
 fn impl_string_id(_attr_ast: &syn::AttributeArgs, item_ast: &syn::ItemStruct) -> TokenStream {
     let name = &item_ast.ident;
     let gen = quote! {
-        #[derive(std::fmt::Debug, Clone, PartialEq, Eq, Hash)]
+        #[derive(std::fmt::Debug)]
         #item_ast
 
         impl #name {
@@ -29,6 +29,26 @@ fn impl_string_id(_attr_ast: &syn::AttributeArgs, item_ast: &syn::ItemStruct) ->
                 self.0
             }
         }
+
+        impl std::clone::Clone for #name {
+            fn clone(&self) -> Self {
+                #name(self.0.clone())
+            }
+        }
+
+        impl std::hash::Hash for #name {
+            fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+                self.0.hash(state);
+            }
+        }
+
+        impl std::cmp::PartialEq for #name {
+            fn eq(&self, other: &Self) -> bool {
+                self.0 == other.0
+            }
+        }
+
+        impl std::cmp::Eq for #name {}
 
         impl std::convert::Into<String> for #name {
             fn into(self) -> String {
