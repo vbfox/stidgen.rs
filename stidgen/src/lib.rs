@@ -9,7 +9,6 @@ use syn::{self, parse_macro_input};
 fn impl_string_id(_attr_ast: &syn::AttributeArgs, item_ast: &syn::ItemStruct) -> TokenStream {
     let name = &item_ast.ident;
     let gen = quote! {
-        #[derive(std::fmt::Debug)]
         #item_ast
 
         impl #name {
@@ -59,6 +58,14 @@ fn impl_string_id(_attr_ast: &syn::AttributeArgs, item_ast: &syn::ItemStruct) ->
         impl std::fmt::Display for #name {
             fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 self.0.fmt(f)
+            }
+        }
+
+        impl std::fmt::Debug for #name {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                f.debug_tuple(stringify!(#name))
+                 .field(&self.0)
+                 .finish()
             }
         }
 
