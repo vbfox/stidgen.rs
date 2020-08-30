@@ -1,5 +1,5 @@
-use stidgen::string_id;
 use std::fmt::Display;
+use stidgen::string_id;
 
 #[test]
 fn debug_impl() {
