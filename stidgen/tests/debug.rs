@@ -1,4 +1,13 @@
 use stidgen::string_id;
+use std::fmt::Debug;
+
+#[test]
+fn debug_impl() {
+    #[string_id]
+    struct FooId(String);
+
+    static_assertions::assert_impl_all!(FooId: Debug);
+}
 
 #[test]
 fn debug_string() {
