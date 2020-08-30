@@ -12,36 +12,43 @@ fn impl_string_id(_attr_ast: &syn::AttributeArgs, item_ast: &syn::ItemStruct) ->
         #item_ast
 
         impl #name {
+            #[inline]
             pub fn new<S: Into<String>>(s: S) -> #name {
                 #name(s.into())
             }
 
+            #[inline]
             pub fn as_str(&self) -> &str {
                 &self.0
             }
 
+            #[inline]
             pub fn to_string(&self) -> String {
                 self.0.clone()
             }
 
+            #[inline]
             pub fn into_string(self) -> String {
                 self.0
             }
         }
 
         impl std::clone::Clone for #name {
+            #[inline]
             fn clone(&self) -> Self {
                 #name(self.0.clone())
             }
         }
 
         impl std::hash::Hash for #name {
+            #[inline]
             fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
                 self.0.hash(state);
             }
         }
 
         impl std::cmp::PartialEq for #name {
+            #[inline]
             fn eq(&self, other: &Self) -> bool {
                 self.0 == other.0
             }
@@ -50,12 +57,14 @@ fn impl_string_id(_attr_ast: &syn::AttributeArgs, item_ast: &syn::ItemStruct) ->
         impl std::cmp::Eq for #name {}
 
         impl std::convert::Into<String> for #name {
+            #[inline]
             fn into(self) -> String {
                 self.0
             }
         }
 
         impl std::fmt::Display for #name {
+            #[inline]
             fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 self.0.fmt(f)
             }
@@ -70,12 +79,14 @@ fn impl_string_id(_attr_ast: &syn::AttributeArgs, item_ast: &syn::ItemStruct) ->
         }
 
         impl std::borrow::Borrow<str> for #name {
+            #[inline]
             fn borrow(&self) -> &str {
                 &self.0
             }
         }
 
         impl std::convert::AsRef<str> for #name {
+            #[inline]
             fn as_ref(&self) -> &str {
                 &self.0
             }
