@@ -2,7 +2,7 @@ use std::fmt::Display;
 use stidgen::string_id;
 
 #[test]
-fn debug_impl() {
+fn display_impl() {
     #[string_id]
     struct FooId(String);
 
