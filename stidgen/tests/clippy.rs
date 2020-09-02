@@ -1,8 +1,4 @@
-#![warn(
-    clippy::all,
-    clippy::restriction,
-    clippy::pedantic
-)]
+#![warn(clippy::all, clippy::restriction, clippy::pedantic)]
 
 use stidgen::string_id;
 
