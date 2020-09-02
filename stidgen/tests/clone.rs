@@ -13,7 +13,9 @@ fn clone_id() {
     #[string_id]
     struct FooId(String);
 
-    fn consume(_id: FooId) {}
+    fn consume(id: FooId) {
+        assert_eq!(id.as_str(), "bar");
+    }
 
     let id = FooId::new("bar".to_string());
     let id2 = id.clone();
