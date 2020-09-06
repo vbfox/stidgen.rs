@@ -20,11 +20,6 @@ fn impl_string_id(_attr_ast: &syn::AttributeArgs, item_ast: &syn::ItemStruct) ->
             }
 
             #[inline]
-            pub fn as_str(&self) -> &str {
-                &self.0
-            }
-
-            #[inline]
             pub fn to_string(&self) -> String {
                 self.0.clone()
             }
@@ -103,11 +98,28 @@ fn impl_string_id(_attr_ast: &syn::AttributeArgs, item_ast: &syn::ItemStruct) ->
             }
         }
 
+        #[automatically_derived]
+        impl #name {
+            /// Extracts a string slice containing the entire ID.
+            #[inline]
+            pub fn as_str(&self) -> &str {
+                &self.0
+            }
+        }
 
         #[automatically_derived]
         impl ::std::convert::AsRef<[u8]> for #name {
             #[inline]
             fn as_ref(&self) -> &[u8] {
+                ::std::convert::AsRef::<[u8]>::as_ref(&self.0)
+            }
+        }
+
+        #[automatically_derived]
+        impl #name {
+            /// Returns a byte slice of this ID's contents.
+            #[inline]
+            pub fn as_bytes(&self) -> &[u8] {
                 ::std::convert::AsRef::<[u8]>::as_ref(&self.0)
             }
         }

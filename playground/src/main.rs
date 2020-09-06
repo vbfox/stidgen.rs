@@ -3,7 +3,7 @@ use std::convert::AsRef;
 use stidgen::string_id;
 
 #[string_id]
-struct FooId(String);
+pub struct FooId(String);
 
 fn with_str(_s: &str) {}
 
