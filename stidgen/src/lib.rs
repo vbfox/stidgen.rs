@@ -102,6 +102,15 @@ fn impl_string_id(_attr_ast: &syn::AttributeArgs, item_ast: &syn::ItemStruct) ->
                 &self.0
             }
         }
+
+
+        #[automatically_derived]
+        impl ::std::convert::AsRef<[u8]> for #name {
+            #[inline]
+            fn as_ref(&self) -> &[u8] {
+                ::std::convert::AsRef::<[u8]>::as_ref(&self.0)
+            }
+        }
     };
 
     TokenStream::from(gen)
