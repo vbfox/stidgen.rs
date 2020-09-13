@@ -58,6 +58,22 @@ fn impl_string_id(_attr_ast: &syn::AttributeArgs, item_ast: &syn::ItemStruct) ->
         impl ::std::cmp::Eq for #name {}
 
         #[automatically_derived]
+        impl ::std::cmp::PartialOrd for #name {
+            #[inline]
+            fn partial_cmp(&self, other: &Self) -> Option<::std::cmp::Ordering> {
+                self.0.partial_cmp(&other.0)
+            }
+        }
+
+        #[automatically_derived]
+        impl ::std::cmp::Ord for #name {
+            #[inline]
+            fn cmp(&self, other: &Self) -> ::std::cmp::Ordering {
+                self.0.cmp(&other.0)
+            }
+        }
+
+        #[automatically_derived]
         impl ::std::convert::Into<String> for #name {
             #[inline]
             fn into(self) -> String {
