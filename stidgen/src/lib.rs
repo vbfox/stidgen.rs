@@ -92,6 +92,27 @@ fn impl_debug(name: &Ident) -> TokenStream2 {
     }
 }
 
+fn impl_as_bytes(name: &Ident) -> TokenStream2 {
+    quote! {
+        #[automatically_derived]
+        impl ::std::convert::AsRef<[u8]> for #name {
+            #[inline]
+            fn as_ref(&self) -> &[u8] {
+                ::std::convert::AsRef::<[u8]>::as_ref(&self.0)
+            }
+        }
+
+        #[automatically_derived]
+        impl #name {
+            /// Returns a byte slice of this ID's contents.
+            #[inline]
+            pub fn as_bytes(&self) -> &[u8] {
+                ::std::convert::AsRef::<[u8]>::as_ref(&self.0)
+            }
+        }
+    }
+}
+
 fn impl_string_id(_attr_ast: &syn::AttributeArgs, item_ast: &syn::ItemStruct) -> TokenStream {
     let name = &item_ast.ident;
 
@@ -101,6 +122,7 @@ fn impl_string_id(_attr_ast: &syn::AttributeArgs, item_ast: &syn::ItemStruct) ->
     let ord = impl_ord(name);
     let display = impl_display(name);
     let debug = impl_debug(name);
+    let as_bytes = impl_as_bytes(name);
 
     let gen = quote! {
         #item_ast
@@ -164,22 +186,7 @@ fn impl_string_id(_attr_ast: &syn::AttributeArgs, item_ast: &syn::ItemStruct) ->
             }
         }
 
-        #[automatically_derived]
-        impl ::std::convert::AsRef<[u8]> for #name {
-            #[inline]
-            fn as_ref(&self) -> &[u8] {
-                ::std::convert::AsRef::<[u8]>::as_ref(&self.0)
-            }
-        }
-
-        #[automatically_derived]
-        impl #name {
-            /// Returns a byte slice of this ID's contents.
-            #[inline]
-            pub fn as_bytes(&self) -> &[u8] {
-                ::std::convert::AsRef::<[u8]>::as_ref(&self.0)
-            }
-        }
+        #as_bytes
     };
 
     TokenStream::from(gen)
