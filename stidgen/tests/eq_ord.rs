@@ -1,5 +1,5 @@
-use stidgen::string_id;
 use std::cmp::Ordering;
+use stidgen::string_id;
 
 #[string_id]
 struct FooId(String);
