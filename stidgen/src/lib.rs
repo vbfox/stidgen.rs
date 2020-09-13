@@ -4,11 +4,104 @@
 extern crate proc_macro;
 
 use proc_macro::TokenStream;
+use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
-use syn::{self, parse_macro_input};
+use syn::{self, parse_macro_input, Ident};
+
+fn impl_clone(name: &Ident) -> TokenStream2 {
+    quote! {
+        #[automatically_derived]
+        impl ::std::clone::Clone for #name {
+            #[inline]
+            fn clone(&self) -> Self {
+                #name(self.0.clone())
+            }
+        }
+    }
+}
+
+fn impl_hash(name: &Ident) -> TokenStream2 {
+    quote! {
+        #[automatically_derived]
+        impl ::std::hash::Hash for #name {
+            #[inline]
+            fn hash<H: ::std::hash::Hasher>(&self, state: &mut H) {
+                self.0.hash(state);
+            }
+        }
+    }
+}
+
+fn impl_eq(name: &Ident) -> TokenStream2 {
+    quote! {
+        #[automatically_derived]
+        impl ::std::cmp::PartialEq for #name {
+            #[inline]
+            fn eq(&self, other: &Self) -> bool {
+                self.0 == other.0
+            }
+        }
+
+        #[automatically_derived]
+        impl ::std::cmp::Eq for #name {}
+    }
+}
+
+fn impl_ord(name: &Ident) -> TokenStream2 {
+    quote! {
+        #[automatically_derived]
+        impl ::std::cmp::PartialOrd for #name {
+            #[inline]
+            fn partial_cmp(&self, other: &Self) -> Option<::std::cmp::Ordering> {
+                self.0.partial_cmp(&other.0)
+            }
+        }
+
+        #[automatically_derived]
+        impl ::std::cmp::Ord for #name {
+            #[inline]
+            fn cmp(&self, other: &Self) -> ::std::cmp::Ordering {
+                self.0.cmp(&other.0)
+            }
+        }
+    }
+}
+
+fn impl_display(name: &Ident) -> TokenStream2 {
+    quote! {
+        #[automatically_derived]
+        impl ::std::fmt::Display for #name {
+            #[inline]
+            fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+                ::std::fmt::Display::fmt(&self.0, f)
+            }
+        }
+    }
+}
+
+fn impl_debug(name: &Ident) -> TokenStream2 {
+    quote! {
+        #[automatically_derived]
+        impl ::std::fmt::Debug for #name {
+            fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+                f.debug_tuple(stringify!(#name))
+                 .field(&self.0)
+                 .finish()
+            }
+        }
+    }
+}
 
 fn impl_string_id(_attr_ast: &syn::AttributeArgs, item_ast: &syn::ItemStruct) -> TokenStream {
     let name = &item_ast.ident;
+
+    let clone = impl_clone(name);
+    let hash = impl_hash(name);
+    let eq = impl_eq(name);
+    let ord = impl_ord(name);
+    let display = impl_display(name);
+    let debug = impl_debug(name);
+
     let gen = quote! {
         #item_ast
 
@@ -30,48 +123,10 @@ fn impl_string_id(_attr_ast: &syn::AttributeArgs, item_ast: &syn::ItemStruct) ->
             }
         }
 
-        #[automatically_derived]
-        impl ::std::clone::Clone for #name {
-            #[inline]
-            fn clone(&self) -> Self {
-                #name(self.0.clone())
-            }
-        }
-
-        #[automatically_derived]
-        impl ::std::hash::Hash for #name {
-            #[inline]
-            fn hash<H: ::std::hash::Hasher>(&self, state: &mut H) {
-                self.0.hash(state);
-            }
-        }
-
-        #[automatically_derived]
-        impl ::std::cmp::PartialEq for #name {
-            #[inline]
-            fn eq(&self, other: &Self) -> bool {
-                self.0 == other.0
-            }
-        }
-
-        #[automatically_derived]
-        impl ::std::cmp::Eq for #name {}
-
-        #[automatically_derived]
-        impl ::std::cmp::PartialOrd for #name {
-            #[inline]
-            fn partial_cmp(&self, other: &Self) -> Option<::std::cmp::Ordering> {
-                self.0.partial_cmp(&other.0)
-            }
-        }
-
-        #[automatically_derived]
-        impl ::std::cmp::Ord for #name {
-            #[inline]
-            fn cmp(&self, other: &Self) -> ::std::cmp::Ordering {
-                self.0.cmp(&other.0)
-            }
-        }
+        #clone
+        #hash
+        #eq
+        #ord
 
         #[automatically_derived]
         impl ::std::convert::Into<String> for #name {
@@ -81,22 +136,8 @@ fn impl_string_id(_attr_ast: &syn::AttributeArgs, item_ast: &syn::ItemStruct) ->
             }
         }
 
-        #[automatically_derived]
-        impl ::std::fmt::Display for #name {
-            #[inline]
-            fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-                ::std::fmt::Display::fmt(&self.0, f)
-            }
-        }
-
-        #[automatically_derived]
-        impl ::std::fmt::Debug for #name {
-            fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-                f.debug_tuple(stringify!(#name))
-                 .field(&self.0)
-                 .finish()
-            }
-        }
+        #display
+        #debug
 
         #[automatically_derived]
         impl ::std::borrow::Borrow<str> for #name {
