@@ -76,6 +76,15 @@ fn impl_display(name: &Ident) -> TokenStream2 {
                 ::std::fmt::Display::fmt(&self.0, f)
             }
         }
+
+        #[automatically_derived]
+        impl #name {
+            /// Converts ID to a [String].
+            #[inline]
+            pub fn to_string(&self) -> String {
+                self.0.clone()
+            }
+        }
     }
 }
 
@@ -132,11 +141,6 @@ fn impl_string_id(_attr_ast: &syn::AttributeArgs, item_ast: &syn::ItemStruct) ->
             #[inline]
             pub fn new<S: Into<String>>(s: S) -> #name {
                 #name(s.into())
-            }
-
-            #[inline]
-            pub fn to_string(&self) -> String {
-                self.0.clone()
             }
 
             #[inline]
