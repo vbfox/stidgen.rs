@@ -2,7 +2,7 @@ use std::borrow::Borrow;
 use std::convert::AsRef;
 use stidgen::string_id;
 
-#[string_id]
+#[string_id(NoDefaults, Format)]
 pub struct FooId(String);
 
 fn with_str(_s: &str) {}
@@ -16,7 +16,7 @@ fn main() {
     with_str(id.as_ref());
 
     println!(
-        "{}, {:?}, {}, {}, {}, {}",
+        "format {}\ndebug {:?}\nas_str {}\nto_string {}\ninto_string {}\ninto {}",
         id,
         id,
         id.as_str(),
