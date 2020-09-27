@@ -3,10 +3,13 @@
 
 extern crate proc_macro;
 
+mod options;
+
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
 use syn::{self, parse_macro_input, Ident};
+
 
 fn impl_clone(name: &Ident) -> TokenStream2 {
     quote! {
