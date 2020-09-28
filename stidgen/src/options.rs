@@ -3,6 +3,7 @@ pub enum KnownTypes {
     String,
 }
 
+/// External facing options
 #[derive(Debug, Clone)]
 pub struct Options {
     pub defaults: Option<bool>,
@@ -53,6 +54,8 @@ impl Options {
     }
 }
 
+/// Options for the generator resolved from the passed in options
+/// and the type of ID
 #[derive(Debug, Clone)]
 pub struct ResolvedOptions {
     pub clone: bool,
@@ -68,7 +71,7 @@ pub struct ResolvedOptions {
     pub as_ref: bool,
 }
 
-static any_defaults: ResolvedOptions = ResolvedOptions {
+static ANY_DEFAULTS: ResolvedOptions = ResolvedOptions {
     clone: false,
     hash: false,
     partial_eq: false,
@@ -82,7 +85,7 @@ static any_defaults: ResolvedOptions = ResolvedOptions {
     as_ref: false,
 };
 
-static string_defaults: ResolvedOptions = ResolvedOptions {
+static STRING_DEFAULTS: ResolvedOptions = ResolvedOptions {
     clone: true,
     hash: true,
     partial_eq: true,
@@ -98,7 +101,7 @@ static string_defaults: ResolvedOptions = ResolvedOptions {
 
 fn get_defaults(known_type: Option<KnownTypes>) -> &'static ResolvedOptions {
     match known_type {
-        Some(KnownTypes::String) => &string_defaults,
-        None => &any_defaults
+        Some(KnownTypes::String) => &STRING_DEFAULTS,
+        None => &ANY_DEFAULTS
     }
 }
