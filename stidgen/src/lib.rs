@@ -10,18 +10,31 @@ use proc_macro::TokenStream;
 use quote::quote;
 use syn::{self, parse_macro_input};
 
+macro_rules! add_impl_if_enabled {
+    ( $option:expr, $impl:expr ) => {{
+        if $option {
+            $impl
+        } else {
+            proc_macro2::TokenStream::new()
+        }
+    }};
+}
+
 fn impl_string_id(_attr_ast: &syn::AttributeArgs, item_ast: &syn::ItemStruct) -> TokenStream {
     let name = &item_ast.ident;
+    let known_type = Some(options::KnownTypes::String);
+    let user_options = options::Options::default();
+    let options = user_options.resolve_for(known_type);
 
-    let clone = impls::clone(name);
-    let hash = impls::hash(name);
-    let eq = impls::eq(name);
-    let partial_eq = impls::partial_eq(name);
-    let ord = impls::ord(name);
-    let partial_ord = impls::partial_ord(name);
-    let display = impls::display(name);
-    let debug = impls::debug(name);
-    let as_bytes = impls::as_bytes(name);
+    let clone = add_impl_if_enabled!(options.clone, impls::clone(name));
+    let hash = add_impl_if_enabled!(options.hash, impls::hash(name));
+    let eq = add_impl_if_enabled!(options.eq, impls::eq(name));
+    let partial_eq = add_impl_if_enabled!(options.partial_eq, impls::partial_eq(name));
+    let ord = add_impl_if_enabled!(options.ord, impls::ord(name));
+    let partial_ord = add_impl_if_enabled!(options.partial_ord, impls::partial_ord(name));
+    let display = add_impl_if_enabled!(options.display, impls::display(name));
+    let debug = add_impl_if_enabled!(options.debug, impls::debug(name));
+    let as_bytes = add_impl_if_enabled!(options.as_bytes, impls::as_bytes(name));
 
     let gen = quote! {
         #item_ast

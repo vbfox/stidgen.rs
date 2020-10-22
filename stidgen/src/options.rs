@@ -20,6 +20,25 @@ pub struct Options {
     pub as_ref: Option<bool>,
 }
 
+impl Default for Options {
+    fn default() -> Self {
+        Options {
+            defaults: None,
+            clone: None,
+            hash: None,
+            partial_eq: None,
+            eq: None,
+            partial_ord: None,
+            ord: None,
+            display: None,
+            debug: None,
+            as_bytes: None,
+            borrow: None,
+            as_ref: None,
+        }
+    }
+}
+
 macro_rules! resolve_one {
     ( $self:expr, $resolved:expr, $x:ident ) => {{
         match $self.$x {
@@ -30,7 +49,7 @@ macro_rules! resolve_one {
 }
 
 impl Options {
-    fn resolve(&self, defaults: &Resolved) -> Resolved {
+    pub fn resolve(&self, defaults: &Resolved) -> Resolved {
         let mut resolved = defaults.clone();
 
         resolve_one!(self, resolved, clone);
