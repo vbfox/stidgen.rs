@@ -3,8 +3,8 @@
 
 extern crate proc_macro;
 
-mod options;
 mod impls;
+mod options;
 
 use proc_macro::TokenStream;
 use quote::quote;

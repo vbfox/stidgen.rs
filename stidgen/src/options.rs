@@ -26,11 +26,11 @@ macro_rules! resolve_one {
             Some(value) => $resolved.$x = value,
             None => {}
         }
-    }}
+    }};
 }
 
 impl Options {
-    fn resolve(&self, defaults: &ResolvedOptions) -> ResolvedOptions {
+    fn resolve(&self, defaults: &Resolved) -> Resolved {
         let mut resolved = defaults.clone();
 
         resolve_one!(self, resolved, clone);
@@ -48,7 +48,7 @@ impl Options {
         resolved
     }
 
-    pub fn resolve_for(&self, known_type: Option<KnownTypes>) -> ResolvedOptions {
+    pub fn resolve_for(&self, known_type: Option<KnownTypes>) -> Resolved {
         let defaults = get_defaults(known_type);
         self.resolve(defaults)
     }
@@ -56,8 +56,9 @@ impl Options {
 
 /// Options for the generator resolved from the passed in options
 /// and the type of ID
+#[allow(clippy::struct_excessive_bools)]
 #[derive(Debug, Clone)]
-pub struct ResolvedOptions {
+pub struct Resolved {
     pub clone: bool,
     pub hash: bool,
     pub partial_eq: bool,
@@ -71,7 +72,7 @@ pub struct ResolvedOptions {
     pub as_ref: bool,
 }
 
-static ANY_DEFAULTS: ResolvedOptions = ResolvedOptions {
+static ANY_DEFAULTS: Resolved = Resolved {
     clone: false,
     hash: false,
     partial_eq: false,
@@ -85,7 +86,7 @@ static ANY_DEFAULTS: ResolvedOptions = ResolvedOptions {
     as_ref: false,
 };
 
-static STRING_DEFAULTS: ResolvedOptions = ResolvedOptions {
+static STRING_DEFAULTS: Resolved = Resolved {
     clone: true,
     hash: true,
     partial_eq: true,
@@ -99,9 +100,9 @@ static STRING_DEFAULTS: ResolvedOptions = ResolvedOptions {
     as_ref: true,
 };
 
-fn get_defaults(known_type: Option<KnownTypes>) -> &'static ResolvedOptions {
+fn get_defaults(known_type: Option<KnownTypes>) -> &'static Resolved {
     match known_type {
         Some(KnownTypes::String) => &STRING_DEFAULTS,
-        None => &ANY_DEFAULTS
+        None => &ANY_DEFAULTS,
     }
 }
