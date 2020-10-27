@@ -21,7 +21,7 @@ fn main() {
         id,
         id.as_str(),
         id.to_string(),
-        idstr.into_string(),
+        idstr.into_inner(),
         s
     );
 }

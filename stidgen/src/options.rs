@@ -18,6 +18,9 @@ pub struct Options {
     pub as_bytes: Option<bool>,
     pub borrow: Option<bool>,
     pub as_ref: Option<bool>,
+    pub into_inner: Option<bool>,
+    pub new: Option<bool>,
+    pub as_str: Option<bool>,
 }
 
 impl Default for Options {
@@ -35,6 +38,9 @@ impl Default for Options {
             as_bytes: None,
             borrow: None,
             as_ref: None,
+            into_inner: None,
+            new: None,
+            as_str: None,
         }
     }
 }
@@ -63,6 +69,9 @@ impl Options {
         resolve_one!(self, resolved, as_bytes);
         resolve_one!(self, resolved, borrow);
         resolve_one!(self, resolved, as_ref);
+        resolve_one!(self, resolved, into_inner);
+        resolve_one!(self, resolved, new);
+        resolve_one!(self, resolved, as_str);
 
         resolved
     }
@@ -89,6 +98,9 @@ pub struct Resolved {
     pub as_bytes: bool,
     pub borrow: bool,
     pub as_ref: bool,
+    pub into_inner: bool,
+    pub new: bool,
+    pub as_str: bool,
 }
 
 static ANY_DEFAULTS: Resolved = Resolved {
@@ -103,6 +115,9 @@ static ANY_DEFAULTS: Resolved = Resolved {
     as_bytes: false,
     borrow: false,
     as_ref: false,
+    into_inner: false,
+    new: false,
+    as_str: false,
 };
 
 static STRING_DEFAULTS: Resolved = Resolved {
@@ -117,6 +132,9 @@ static STRING_DEFAULTS: Resolved = Resolved {
     as_bytes: true,
     borrow: true,
     as_ref: true,
+    into_inner: true,
+    new: true,
+    as_str: true,
 };
 
 fn get_defaults(known_type: Option<KnownTypes>) -> &'static Resolved {

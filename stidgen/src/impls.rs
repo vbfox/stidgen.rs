@@ -123,3 +123,72 @@ pub fn as_bytes(name: &Ident) -> TokenStream2 {
         }
     }
 }
+
+pub fn into_inner(name: &Ident) -> TokenStream2 {
+    quote! {
+        #[automatically_derived]
+        impl #name {
+            #[inline]
+            pub fn into_inner(self) -> String {
+                self.0
+            }
+        }
+
+        #[automatically_derived]
+        impl ::std::convert::Into<String> for #name {
+            #[inline]
+            fn into(self) -> String {
+                self.0
+            }
+        }
+    }
+}
+
+pub fn new(name: &Ident) -> TokenStream2 {
+    quote! {
+        #[automatically_derived]
+        impl #name {
+            #[inline]
+            pub fn new<S: Into<String>>(s: S) -> #name {
+                #name(s.into())
+            }
+        }
+    }
+}
+
+pub fn borrow(name: &Ident) -> TokenStream2 {
+    quote! {
+        #[automatically_derived]
+        impl ::std::borrow::Borrow<str> for #name {
+            #[inline]
+            fn borrow(&self) -> &str {
+                &self.0
+            }
+        }
+    }
+}
+
+pub fn as_ref(name: &Ident) -> TokenStream2 {
+    quote! {
+        #[automatically_derived]
+        impl ::std::convert::AsRef<str> for #name {
+            #[inline]
+            fn as_ref(&self) -> &str {
+                &self.0
+            }
+        }
+    }
+}
+
+pub fn as_str(name: &Ident) -> TokenStream2 {
+    quote! {
+        #[automatically_derived]
+        impl #name {
+            /// Extracts a string slice containing the entire ID.
+            #[inline]
+            pub fn as_str(&self) -> &str {
+                &self.0
+            }
+        }
+    }
+}
