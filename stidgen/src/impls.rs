@@ -1,6 +1,6 @@
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
-use syn::{self, Ident};
+use syn::{self, Ident, Type};
 
 pub fn clone(name: &Ident) -> TokenStream2 {
     quote! {
@@ -124,32 +124,32 @@ pub fn as_bytes(name: &Ident) -> TokenStream2 {
     }
 }
 
-pub fn into_inner(name: &Ident) -> TokenStream2 {
+pub fn into_inner(name: &Ident, inner_type: &Type) -> TokenStream2 {
     quote! {
         #[automatically_derived]
         impl #name {
             #[inline]
-            pub fn into_inner(self) -> String {
+            pub fn into_inner(self) -> #inner_type {
                 self.0
             }
         }
 
         #[automatically_derived]
-        impl ::std::convert::Into<String> for #name {
+        impl ::std::convert::Into<#inner_type> for #name {
             #[inline]
-            fn into(self) -> String {
+            fn into(self) -> #inner_type {
                 self.0
             }
         }
     }
 }
 
-pub fn new(name: &Ident) -> TokenStream2 {
+pub fn new(name: &Ident, inner_type: &Type) -> TokenStream2 {
     quote! {
         #[automatically_derived]
         impl #name {
             #[inline]
-            pub fn new<S: Into<String>>(s: S) -> #name {
+            pub fn new<S: Into<#inner_type>>(s: S) -> #name {
                 #name(s.into())
             }
         }

@@ -9,7 +9,7 @@ mod options;
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
-use syn::{self, parse_macro_input, Ident};
+use syn::{self, parse_macro_input, Ident, Type};
 
 macro_rules! add_impl_if_enabled {
     ( $option:expr, $impl:expr ) => {{
@@ -21,9 +21,49 @@ macro_rules! add_impl_if_enabled {
     }};
 }
 
+#[derive(Debug)]
+enum TypeInfoError {
+    NamedFields,
+    UnitFields,
+    InvalidFieldCount { count: usize },
+}
+
+struct IdTypeInfo {
+    name: Ident,
+    inner_type: Type,
+}
+
+impl IdTypeInfo {
+    pub fn new(item_ast: &syn::ItemStruct) -> Result<Self, TypeInfoError> {
+        match item_ast.fields {
+            syn::Fields::Named(_) => Err(TypeInfoError::NamedFields),
+            syn::Fields::Unit => Err(TypeInfoError::UnitFields),
+            syn::Fields::Unnamed(_) => {
+                if item_ast.fields.len() == 1 {
+                    let field = item_ast
+                        .fields
+                        .iter()
+                        .next()
+                        .expect("Field count was checked")
+                        .clone();
+
+                    Ok(Self {
+                        name: item_ast.ident.clone(),
+                        inner_type: field.ty,
+                    })
+                } else {
+                    Err(TypeInfoError::InvalidFieldCount {
+                        count: item_ast.fields.len(),
+                    })
+                }
+            }
+        }
+    }
+}
+
 struct Stidgen<'a> {
     resolved_options: &'a options::Resolved,
-    name: &'a Ident,
+    type_info: IdTypeInfo,
     item_ast: &'a syn::ItemStruct,
 }
 
@@ -31,13 +71,14 @@ impl<'a> Stidgen<'a> {
     pub fn new(item_ast: &'a syn::ItemStruct, resolved_options: &'a options::Resolved) -> Self {
         Self {
             resolved_options,
-            name: &item_ast.ident,
             item_ast,
+            type_info: IdTypeInfo::new(item_ast).unwrap(),
         }
     }
 
     pub fn to_tokens(&self) -> TokenStream2 {
-        let name = self.name;
+        let name = &(self.type_info.name);
+        let inner_type = &(self.type_info.inner_type);
         let options = self.resolved_options;
         let item_ast = self.item_ast;
 
@@ -50,15 +91,18 @@ impl<'a> Stidgen<'a> {
         let display = add_impl_if_enabled!(options.display, impls::display(name));
         let debug = add_impl_if_enabled!(options.debug, impls::debug(name));
         let as_bytes = add_impl_if_enabled!(options.as_bytes, impls::as_bytes(name));
-        let into_inner = add_impl_if_enabled!(options.into_inner, impls::into_inner(name));
-        let new = add_impl_if_enabled!(options.new, impls::new(name));
+        let into_inner =
+            add_impl_if_enabled!(options.into_inner, impls::into_inner(name, inner_type));
+        let new = add_impl_if_enabled!(options.new, impls::new(name, inner_type));
         let as_ref = add_impl_if_enabled!(options.as_ref, impls::as_ref(name));
         let borrow = add_impl_if_enabled!(options.borrow, impls::borrow(name));
         let as_str = add_impl_if_enabled!(options.as_str, impls::as_str(name));
 
         quote! {
             #item_ast
+
             #new
+
             #into_inner
             #clone
             #hash
