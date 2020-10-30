@@ -127,7 +127,7 @@ fn impl_string_id(_attr_ast: &syn::AttributeArgs, item_ast: &syn::ItemStruct) ->
 
     let gen = Stidgen::new(item_ast, &options);
 
-    TokenStream::from(gen.to_tokens())
+    gen.to_tokens().into()
 }
 
 #[proc_macro_attribute]
