@@ -4,12 +4,14 @@
 extern crate proc_macro;
 
 mod impls;
+mod known_types;
 mod options;
 
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
 use syn::{self, parse_macro_input, Ident, Type};
+use known_types::KnownTypes;
 
 macro_rules! add_impl_if_enabled {
     ( $option:expr, $impl:expr ) => {{
@@ -120,11 +122,17 @@ impl<'a> Stidgen<'a> {
     }
 }
 
-fn impl_string_id(_attr_ast: &syn::AttributeArgs, item_ast: &syn::ItemStruct) -> TokenStream {
-    let known_type = Some(options::KnownTypes::String);
+fn get_options(_attr_ast: &syn::AttributeArgs, item_ast: &syn::ItemStruct, id_type_info: &IdTypeInfo) -> options::Resolved {
+    let known_type = Some(KnownTypes::String);
     let user_options = options::Options::default();
-    let options = user_options.resolve_for(known_type);
+    let defaults = known_types::get_defaults(known_type);
+    let options = user_options.resolve(defaults);
+    options
+}
 
+fn impl_string_id(attr_ast: &syn::AttributeArgs, item_ast: &syn::ItemStruct) -> TokenStream {
+    let id_type_info = IdTypeInfo::new(item_ast).unwrap();
+    let options = get_options(attr_ast, item_ast, &id_type_info);
     let gen = Stidgen::new(item_ast, &options);
 
     gen.to_tokens().into()

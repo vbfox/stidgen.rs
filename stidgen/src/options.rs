@@ -1,8 +1,3 @@
-#[derive(Debug, Clone, Copy)]
-pub enum KnownTypes {
-    String,
-}
-
 /// External facing options
 #[derive(Debug, Clone)]
 pub struct Options {
@@ -75,11 +70,6 @@ impl Options {
 
         resolved
     }
-
-    pub fn resolve_for(&self, known_type: Option<KnownTypes>) -> Resolved {
-        let defaults = get_defaults(known_type);
-        self.resolve(defaults)
-    }
 }
 
 /// Options for the generator resolved from the passed in options
@@ -101,45 +91,4 @@ pub struct Resolved {
     pub into_inner: bool,
     pub new: bool,
     pub as_str: bool,
-}
-
-static ANY_DEFAULTS: Resolved = Resolved {
-    clone: false,
-    hash: false,
-    partial_eq: false,
-    eq: false,
-    partial_ord: false,
-    ord: false,
-    display: false,
-    debug: false,
-    as_bytes: false,
-    borrow: false,
-    as_ref: false,
-    into_inner: false,
-    new: false,
-    as_str: false,
-};
-
-static STRING_DEFAULTS: Resolved = Resolved {
-    clone: true,
-    hash: true,
-    partial_eq: true,
-    eq: true,
-    partial_ord: true,
-    ord: true,
-    display: true,
-    debug: true,
-    as_bytes: true,
-    borrow: true,
-    as_ref: true,
-    into_inner: true,
-    new: true,
-    as_str: true,
-};
-
-fn get_defaults(known_type: Option<KnownTypes>) -> &'static Resolved {
-    match known_type {
-        Some(KnownTypes::String) => &STRING_DEFAULTS,
-        None => &ANY_DEFAULTS,
-    }
 }
