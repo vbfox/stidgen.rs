@@ -11,7 +11,6 @@ use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
 use syn::{self, parse_macro_input, Ident, Type};
-use known_types::KnownTypes;
 
 macro_rules! add_impl_if_enabled {
     ( $option:expr, $impl:expr ) => {{
@@ -70,11 +69,15 @@ struct Stidgen<'a> {
 }
 
 impl<'a> Stidgen<'a> {
-    pub fn new(item_ast: &'a syn::ItemStruct, resolved_options: &'a options::Resolved) -> Self {
+    pub fn new(
+        item_ast: &'a syn::ItemStruct,
+        resolved_options: &'a options::Resolved,
+        type_info: IdTypeInfo,
+    ) -> Self {
         Self {
             resolved_options,
             item_ast,
-            type_info: IdTypeInfo::new(item_ast).unwrap(),
+            type_info,
         }
     }
 
@@ -122,18 +125,17 @@ impl<'a> Stidgen<'a> {
     }
 }
 
-fn get_options(_attr_ast: &syn::AttributeArgs, item_ast: &syn::ItemStruct, id_type_info: &IdTypeInfo) -> options::Resolved {
-    let known_type = Some(KnownTypes::String);
+fn get_options(_attr_ast: &syn::AttributeArgs, id_type_info: &IdTypeInfo) -> options::Resolved {
     let user_options = options::Options::default();
-    let defaults = known_types::get_defaults(known_type);
+    let defaults = known_types::get_defaults(&id_type_info.inner_type);
     let options = user_options.resolve(defaults);
     options
 }
 
 fn impl_string_id(attr_ast: &syn::AttributeArgs, item_ast: &syn::ItemStruct) -> TokenStream {
-    let id_type_info = IdTypeInfo::new(item_ast).unwrap();
-    let options = get_options(attr_ast, item_ast, &id_type_info);
-    let gen = Stidgen::new(item_ast, &options);
+    let id_type_info = IdTypeInfo::new(item_ast).unwrap(); // TODO: We resolve that twice...
+    let options = get_options(attr_ast, &id_type_info);
+    let gen = Stidgen::new(item_ast, &options, id_type_info);
 
     gen.to_tokens().into()
 }

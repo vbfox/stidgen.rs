@@ -1,9 +1,9 @@
 use crate::options::Resolved;
 use once_cell::sync::Lazy;
-use syn::{parse::ParseBuffer, Type, TypeParen};
+use syn::Type;
 
 #[derive(Debug, Clone, Copy)]
-pub enum KnownTypes {
+enum KnownTypes {
     String,
 }
 
@@ -43,52 +43,73 @@ static STRING_DEFAULTS: Resolved = Resolved {
 
 struct KnownTypeInfo {
     pub known_type: KnownTypes,
-    pub default_options: Resolved,
-    pub types: Vec<syn::Type>,
+    pub default_options: &'static Resolved,
+    pub types: Vec<String>,
 }
 
 impl KnownTypeInfo {
-    pub fn new(known_type: KnownTypes, default_options: Resolved, parseable_types: Vec<&str>) -> KnownTypeInfo {
-        let types = parseable_types
-            .into_iter()
-            .map(|t| syn::parse_str(t).expect("Hardcoded types should parse"))
-            .collect::<Vec<syn::Type>>();
-
+    pub fn new(
+        known_type: KnownTypes,
+        default_options: &'static Resolved,
+        parseable_types: Vec<&str>,
+    ) -> KnownTypeInfo {
         #[cfg(debug_assertions)]
-        for ty in types.iter() {
-            if try_get_path_type(&ty) != Some(&ty) {
-                panic!("Only Path types should be registered as known")
+        {
+            let parsed_types = parseable_types
+                .iter()
+                .map(|t| syn::parse_str(t).expect("Hardcoded types should parse"))
+                .collect::<Vec<syn::Type>>();
+
+            for ty in parsed_types.iter() {
+                match try_get_path_type(&ty) {
+                    Some(_) => {}
+                    None => panic!("Only Path types should be registered as known"),
+                }
             }
         }
 
-        KnownTypeInfo { known_type, default_options, types }
+        let types = parseable_types
+            .into_iter()
+            .map(|t| t.to_string())
+            .collect::<Vec<_>>();
+
+        KnownTypeInfo {
+            known_type,
+            default_options,
+            types,
+        }
+    }
+
+    fn types_iter(&self) -> impl Iterator<Item = Type> + '_ {
+        self.types
+            .iter()
+            .map(|t| syn::parse_str(t).expect("Hardcoded types should parse"))
+    }
+
+    pub fn matches(&self, t: &Type) -> bool {
+        self.types_iter().find(|m| *m == *t).is_some()
     }
 }
 
-
-static KNOWN_TYPE_INFOS: Lazy<Vec<KnownTypeInfo>> = Lazy::new(|| {
+fn build_defaults() -> Vec<KnownTypeInfo> {
     let mut result: Vec<KnownTypeInfo> = Vec::new();
 
-    result.push(
-        KnownTypeInfo::new(
-            KnownTypes::String,
-            STRING_DEFAULTS,
-            vec!("String", "std::string::String", "::std::string::String")
-        )
-    );
+    result.push(KnownTypeInfo::new(
+        KnownTypes::String,
+        &STRING_DEFAULTS,
+        vec!["String", "std::string::String", "::std::string::String"],
+    ));
 
     result
-});
+}
 
-//let t: Type = syn::parse_str("std::collections::HashMap<String, Value>")?;
+static KNOWN_TYPE_INFOS: Lazy<Vec<KnownTypeInfo>> = Lazy::new(|| build_defaults());
 
 /// Get the type if it is a `Type::Path`, extract the `Type::Path` if wrapped in `Type::Paren`, `None` otherwise.
 fn try_get_path_type(ty: &Type) -> Option<&Type> {
     match ty {
         Type::Paren(paren) => try_get_path_type(&paren.elem),
-        Type::Path(_) => {
-            Some(&ty)
-        },
+        Type::Path(_) => Some(&ty),
         _ => None,
     }
 }
@@ -96,15 +117,13 @@ fn try_get_path_type(ty: &Type) -> Option<&Type> {
 impl KnownTypeInfo {
     pub fn from_type(ty: &Type) -> Option<&KnownTypeInfo> {
         let path_type = try_get_path_type(ty)?;
-        KNOWN_TYPE_INFOS.iter().find(|ti| {
-            ti.types.iter().find(|t| *t == path_type).is_some()
-        })
+        KNOWN_TYPE_INFOS.iter().find(|ti| ti.matches(path_type))
     }
 }
 
-pub fn get_defaults(known_type: Option<KnownTypes>) -> &'static Resolved {
-    match known_type {
-        Some(KnownTypes::String) => &STRING_DEFAULTS,
+pub fn get_defaults(for_type: &Type) -> &'static Resolved {
+    match KnownTypeInfo::from_type(for_type) {
+        Some(known_type) => known_type.default_options,
         None => &ANY_DEFAULTS,
     }
 }
