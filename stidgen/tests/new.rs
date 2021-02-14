@@ -22,8 +22,8 @@ fn new_str() {
 fn new_into_string() {
     struct IntoString {}
 
-    impl Into<String> for IntoString {
-        fn into(self) -> String {
+    impl From<IntoString> for String {
+        fn from(_: IntoString) -> String {
             "bar".to_string()
         }
     }
@@ -50,8 +50,8 @@ fn new_i32() {
 fn new_into_i32() {
     struct IntoNumber {}
 
-    impl Into<i32> for IntoNumber {
-        fn into(self) -> i32 {
+    impl From<IntoNumber> for i32 {
+        fn from(_: IntoNumber) -> i32 {
             42
         }
     }
