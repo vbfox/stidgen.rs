@@ -6,3 +6,4 @@ edition = "2018"
 
 [dependencies]
 stidgen = { path = "../stidgen" }
+uuid = "0.8.2"

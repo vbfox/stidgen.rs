@@ -1,12 +1,16 @@
 use std::borrow::Borrow;
 use std::convert::AsRef;
 use stidgen::string_id;
+use uuid::Uuid;
 
-#[string_id(NoDefaults, Format)]
+#[string_id()]
 pub struct FooStringId(String);
 
-#[string_id(NoDefaults, Format)]
+#[string_id()]
 pub struct FooI32Id(i32);
+
+#[string_id()]
+pub struct FooGuidId(Uuid);
 
 fn with_str(_s: &str) {}
 
@@ -30,6 +34,15 @@ fn main() {
 
     println!("---");
     let xi = FooI32Id::new(42);
+    println!(
+        "format {}\ndebug {:?}\nto_string {}",
+        xi,
+        xi,
+        xi.to_string()
+    );
+
+    println!("---");
+    let xi = FooGuidId::new(Uuid::parse_str("936DA01F9ABD4d9d80C702AF85C822A8").unwrap());
     println!(
         "format {}\ndebug {:?}\nto_string {}",
         xi,

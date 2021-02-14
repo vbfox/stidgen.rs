@@ -17,6 +17,7 @@ enum KnownTypes {
     U128,
     ISize,
     USize,
+    Uuid,
 }
 
 static ANY_DEFAULTS: Resolved = Resolved {
@@ -56,6 +57,24 @@ static STRING_DEFAULTS: Resolved = Resolved {
 };
 
 static NUMBER_DEFAULTS: Resolved = Resolved {
+    clone: true,
+    hash: true,
+    partial_eq: true,
+    eq: true,
+    partial_ord: true,
+    ord: true,
+    display: true,
+    to_string: true,
+    debug: true,
+    as_bytes: false,
+    borrow_string: false,
+    as_ref: false,
+    into_inner: true,
+    new: true,
+    as_str: false,
+};
+
+static UUID_DEFAULTS: Resolved = Resolved {
     clone: true,
     hash: true,
     partial_eq: true,
@@ -202,6 +221,12 @@ fn build_defaults() -> Vec<KnownTypeInfo> {
         KnownTypes::USize,
         &NUMBER_DEFAULTS,
         vec!["usize", "std::usize"],
+    ));
+
+    result.push(KnownTypeInfo::new(
+        KnownTypes::Uuid,
+        &UUID_DEFAULTS,
+        vec!["Uuid", "uuid::Uuid"],
     ));
 
     result
