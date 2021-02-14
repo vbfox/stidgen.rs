@@ -130,8 +130,7 @@ impl<'a> Stidgen<'a> {
 fn get_options(_attr_ast: &syn::AttributeArgs, id_type_info: &IdTypeInfo) -> options::Resolved {
     let user_options = options::Options::default();
     let defaults = known_types::get_defaults(&id_type_info.inner_type);
-    let options = user_options.resolve(defaults);
-    options
+    user_options.resolve(defaults)
 }
 
 fn impl_id_type(attr_ast: &syn::AttributeArgs, item_ast: &syn::ItemStruct) -> TokenStream {

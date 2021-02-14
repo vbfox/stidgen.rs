@@ -121,7 +121,7 @@ impl KnownTypeInfo {
 
         let types = parseable_types
             .into_iter()
-            .map(|t| t.to_string())
+            .map(ToString::to_string)
             .collect::<Vec<_>>();
 
         KnownTypeInfo {
@@ -232,7 +232,7 @@ fn build_defaults() -> Vec<KnownTypeInfo> {
     result
 }
 
-static KNOWN_TYPE_INFOS: Lazy<Vec<KnownTypeInfo>> = Lazy::new(|| build_defaults());
+static KNOWN_TYPE_INFOS: Lazy<Vec<KnownTypeInfo>> = Lazy::new(build_defaults);
 
 /// Get the type if it is a `Type::Path`, extract the `Type::Path` if wrapped in `Type::Paren`, `None` otherwise.
 fn try_get_path_type(ty: &Type) -> Option<&Type> {
