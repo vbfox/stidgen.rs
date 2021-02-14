@@ -111,7 +111,7 @@ impl KnownTypeInfo {
                 .map(|t| syn::parse_str(t).expect("Hardcoded types should parse"))
                 .collect::<Vec<syn::Type>>();
 
-            for ty in parsed_types.iter() {
+            for ty in &parsed_types {
                 match try_get_path_type(&ty) {
                     Some(_) => {}
                     None => panic!("Only Path types should be registered as known"),
@@ -138,98 +138,47 @@ impl KnownTypeInfo {
     }
 
     pub fn matches(&self, t: &Type) -> bool {
-        self.types_iter().find(|m| *m == *t).is_some()
+        self.types_iter().any(|m| m == *t)
     }
 }
 
 fn build_defaults() -> Vec<KnownTypeInfo> {
-    let mut result: Vec<KnownTypeInfo> = Vec::new();
-
-    result.push(KnownTypeInfo::new(
-        KnownTypes::String,
-        &STRING_DEFAULTS,
-        vec!["String", "std::string::String", "::std::string::String"],
-    ));
-
-    result.push(KnownTypeInfo::new(
-        KnownTypes::I8,
-        &NUMBER_DEFAULTS,
-        vec!["i8", "std::i8"],
-    ));
-
-    result.push(KnownTypeInfo::new(
-        KnownTypes::U8,
-        &NUMBER_DEFAULTS,
-        vec!["u8", "std::u8"],
-    ));
-
-    result.push(KnownTypeInfo::new(
-        KnownTypes::I16,
-        &NUMBER_DEFAULTS,
-        vec!["i16", "std::i16"],
-    ));
-
-    result.push(KnownTypeInfo::new(
-        KnownTypes::U16,
-        &NUMBER_DEFAULTS,
-        vec!["u16", "std::u16"],
-    ));
-
-    result.push(KnownTypeInfo::new(
-        KnownTypes::I32,
-        &NUMBER_DEFAULTS,
-        vec!["i32", "std::i32"],
-    ));
-
-    result.push(KnownTypeInfo::new(
-        KnownTypes::U32,
-        &NUMBER_DEFAULTS,
-        vec!["u32", "std::u32"],
-    ));
-
-    result.push(KnownTypeInfo::new(
-        KnownTypes::I64,
-        &NUMBER_DEFAULTS,
-        vec!["i64", "std::i64"],
-    ));
-
-    result.push(KnownTypeInfo::new(
-        KnownTypes::U64,
-        &NUMBER_DEFAULTS,
-        vec!["u64", "std::u64"],
-    ));
-
-    result.push(KnownTypeInfo::new(
-        KnownTypes::I128,
-        &NUMBER_DEFAULTS,
-        vec!["i128", "std::i128"],
-    ));
-
-    result.push(KnownTypeInfo::new(
-        KnownTypes::U128,
-        &NUMBER_DEFAULTS,
-        vec!["u128", "std::u128"],
-    ));
-
-    result.push(KnownTypeInfo::new(
-        KnownTypes::ISize,
-        &NUMBER_DEFAULTS,
-        vec!["isize", "std::isize"],
-    ));
-
-    result.push(KnownTypeInfo::new(
-        KnownTypes::USize,
-        &NUMBER_DEFAULTS,
-        vec!["usize", "std::usize"],
-    ));
-
-    result.push(KnownTypeInfo::new(
-        KnownTypes::Uuid,
-        &UUID_DEFAULTS,
-        vec!["Uuid", "uuid::Uuid"],
-    ));
-
-    result
+    vec![
+        KnownTypeInfo::new(
+            KnownTypes::String,
+            &STRING_DEFAULTS,
+            vec!["String", "std::string::String", "::std::string::String"],
+        ),
+        KnownTypeInfo::new(KnownTypes::I8, &NUMBER_DEFAULTS, vec!["i8", "std::i8"]),
+        KnownTypeInfo::new(KnownTypes::U8, &NUMBER_DEFAULTS, vec!["u8", "std::u8"]),
+        KnownTypeInfo::new(KnownTypes::I16, &NUMBER_DEFAULTS, vec!["i16", "std::i16"]),
+        KnownTypeInfo::new(KnownTypes::U16, &NUMBER_DEFAULTS, vec!["u16", "std::u16"]),
+        KnownTypeInfo::new(KnownTypes::I32, &NUMBER_DEFAULTS, vec!["i32", "std::i32"]),
+        KnownTypeInfo::new(KnownTypes::U32, &NUMBER_DEFAULTS, vec!["u32", "std::u32"]),
+        KnownTypeInfo::new(KnownTypes::I64, &NUMBER_DEFAULTS, vec!["i64", "std::i64"]),
+        KnownTypeInfo::new(KnownTypes::U64, &NUMBER_DEFAULTS, vec!["u64", "std::u64"]),
+        KnownTypeInfo::new(
+            KnownTypes::I128,
+            &NUMBER_DEFAULTS,
+            vec!["i128", "std::i128"],
+        ),
+        KnownTypeInfo::new(
+            KnownTypes::U128,
+            &NUMBER_DEFAULTS,
+            vec!["u128", "std::u128"],
+        ),
+        KnownTypeInfo::new(
+            KnownTypes::ISize,
+            &NUMBER_DEFAULTS,
+            vec!["isize", "std::isize"],
+        ),
+        KnownTypeInfo::new(
+            KnownTypes::USize,
+            &NUMBER_DEFAULTS,
+            vec!["usize", "std::usize"],
+        ),
+        KnownTypeInfo::new(KnownTypes::Uuid, &UUID_DEFAULTS, vec!["Uuid", "uuid::Uuid"]),
+    ]
 }
 
 static KNOWN_TYPE_INFOS: Lazy<Vec<KnownTypeInfo>> = Lazy::new(build_defaults);
