@@ -28,9 +28,18 @@ fn string_ord_impl() {
 #[test]
 fn string_partial_ord() {
     let id = TestStringId::new("bar");
-    assert_eq!(TestStringId::new("bar").partial_cmp(&id), Some(Ordering::Equal));
-    assert_eq!(TestStringId::new("car").partial_cmp(&id), Some(Ordering::Greater));
-    assert_eq!(TestStringId::new("aar").partial_cmp(&id), Some(Ordering::Less));
+    assert_eq!(
+        TestStringId::new("bar").partial_cmp(&id),
+        Some(Ordering::Equal)
+    );
+    assert_eq!(
+        TestStringId::new("car").partial_cmp(&id),
+        Some(Ordering::Greater)
+    );
+    assert_eq!(
+        TestStringId::new("aar").partial_cmp(&id),
+        Some(Ordering::Less)
+    );
 }
 
 #[test]
