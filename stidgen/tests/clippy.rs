@@ -10,8 +10,6 @@
     clippy::dbg_macro,
     clippy::decimal_literal_representation,
     clippy::else_if_without_else,
-    clippy::exhaustive_enums,
-    clippy::exhaustive_structs,
     clippy::exit,
     clippy::expect_used,
     clippy::filetype_is_file,
