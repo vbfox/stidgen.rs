@@ -94,13 +94,14 @@ impl<'a> Stidgen<'a> {
         let ord = add_impl_if_enabled!(options.ord, impls::ord(name));
         let partial_ord = add_impl_if_enabled!(options.partial_ord, impls::partial_ord(name));
         let display = add_impl_if_enabled!(options.display, impls::display(name));
+        let to_string = add_impl_if_enabled!(options.to_string, impls::to_string(name, inner_type));
         let debug = add_impl_if_enabled!(options.debug, impls::debug(name));
         let as_bytes = add_impl_if_enabled!(options.as_bytes, impls::as_bytes(name));
         let into_inner =
             add_impl_if_enabled!(options.into_inner, impls::into_inner(name, inner_type));
         let new = add_impl_if_enabled!(options.new, impls::new(name, inner_type));
         let as_ref = add_impl_if_enabled!(options.as_ref, impls::as_ref(name));
-        let borrow = add_impl_if_enabled!(options.borrow, impls::borrow(name));
+        let borrow = add_impl_if_enabled!(options.borrow_string, impls::borrow_string(name));
         let as_str = add_impl_if_enabled!(options.as_str, impls::as_str(name));
 
         quote! {
@@ -116,6 +117,7 @@ impl<'a> Stidgen<'a> {
             #ord
             #partial_ord
             #display
+            #to_string
             #debug
             #as_ref
             #borrow
@@ -132,7 +134,7 @@ fn get_options(_attr_ast: &syn::AttributeArgs, id_type_info: &IdTypeInfo) -> opt
     options
 }
 
-fn impl_string_id(attr_ast: &syn::AttributeArgs, item_ast: &syn::ItemStruct) -> TokenStream {
+fn impl_id_type(attr_ast: &syn::AttributeArgs, item_ast: &syn::ItemStruct) -> TokenStream {
     let id_type_info = IdTypeInfo::new(item_ast).unwrap(); // TODO: We resolve that twice...
     let options = get_options(attr_ast, &id_type_info);
     let gen = Stidgen::new(item_ast, &options, id_type_info);
@@ -148,5 +150,5 @@ pub fn string_id(attr: TokenStream, item: TokenStream) -> TokenStream {
     let item_ast = parse_macro_input!(item as syn::ItemStruct);
 
     // Build the trait implementation
-    impl_string_id(&attr_ast, &item_ast)
+    impl_id_type(&attr_ast, &item_ast)
 }

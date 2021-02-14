@@ -1,3 +1,5 @@
+use std::any::{Any, TypeId};
+
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
 use syn::{self, Ident, Type};
@@ -78,13 +80,34 @@ pub fn display(name: &Ident) -> TokenStream2 {
                 ::std::fmt::Display::fmt(&self.0, f)
             }
         }
+    }
+}
 
-        #[automatically_derived]
-        impl #name {
-            /// Converts ID to a [String].
-            #[inline]
-            pub fn to_string(&self) -> String {
-                self.0.clone()
+pub fn to_string(name: &Ident, inner_type: &Type) -> TokenStream2 {
+    if inner_type.type_id() == TypeId::of::<String>() {
+        quote! {
+            #[automatically_derived]
+            impl #name {
+                /// Converts ID to a [String].
+                #[inline]
+                pub fn to_string(&self) -> String {
+                    self.0.clone()
+                }
+            }
+        }
+    } else {
+        quote! {
+            #[automatically_derived]
+            impl #name {
+                /// Converts ID to a [String].
+                #[inline]
+                pub fn to_string(&self) -> String {
+                    use ::std::fmt::Write;
+                    let mut buf = String::new();
+                    buf.write_fmt(format_args!("{}", self))
+                        .expect("a Display implementation returned an error unexpectedly");
+                    buf
+                }
             }
         }
     }
@@ -156,7 +179,7 @@ pub fn new(name: &Ident, inner_type: &Type) -> TokenStream2 {
     }
 }
 
-pub fn borrow(name: &Ident) -> TokenStream2 {
+pub fn borrow_string(name: &Ident) -> TokenStream2 {
     quote! {
         #[automatically_derived]
         impl ::std::borrow::Borrow<str> for #name {

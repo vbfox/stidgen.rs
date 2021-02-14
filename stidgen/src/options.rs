@@ -9,9 +9,10 @@ pub struct Options {
     pub partial_ord: Option<bool>,
     pub ord: Option<bool>,
     pub display: Option<bool>,
+    to_string: Option<bool>,
     pub debug: Option<bool>,
     pub as_bytes: Option<bool>,
-    pub borrow: Option<bool>,
+    pub borrow_string: Option<bool>,
     pub as_ref: Option<bool>,
     pub into_inner: Option<bool>,
     pub new: Option<bool>,
@@ -29,9 +30,10 @@ impl Default for Options {
             partial_ord: None,
             ord: None,
             display: None,
+            to_string: None,
             debug: None,
             as_bytes: None,
-            borrow: None,
+            borrow_string: None,
             as_ref: None,
             into_inner: None,
             new: None,
@@ -60,9 +62,10 @@ impl Options {
         resolve_one!(self, resolved, partial_ord);
         resolve_one!(self, resolved, ord);
         resolve_one!(self, resolved, display);
+        resolve_one!(self, resolved, to_string);
         resolve_one!(self, resolved, debug);
         resolve_one!(self, resolved, as_bytes);
-        resolve_one!(self, resolved, borrow);
+        resolve_one!(self, resolved, borrow_string);
         resolve_one!(self, resolved, as_ref);
         resolve_one!(self, resolved, into_inner);
         resolve_one!(self, resolved, new);
@@ -84,9 +87,10 @@ pub struct Resolved {
     pub partial_ord: bool,
     pub ord: bool,
     pub display: bool,
+    pub to_string: bool,
     pub debug: bool,
     pub as_bytes: bool,
-    pub borrow: bool,
+    pub borrow_string: bool,
     pub as_ref: bool,
     pub into_inner: bool,
     pub new: bool,

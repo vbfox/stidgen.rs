@@ -5,6 +5,18 @@ use syn::Type;
 #[derive(Debug, Clone, Copy)]
 enum KnownTypes {
     String,
+    I8,
+    U8,
+    I16,
+    U16,
+    I32,
+    U32,
+    I64,
+    U64,
+    I128,
+    U128,
+    ISize,
+    USize,
 }
 
 static ANY_DEFAULTS: Resolved = Resolved {
@@ -15,9 +27,10 @@ static ANY_DEFAULTS: Resolved = Resolved {
     partial_ord: false,
     ord: false,
     display: false,
+    to_string: false,
     debug: false,
     as_bytes: false,
-    borrow: false,
+    borrow_string: false,
     as_ref: false,
     into_inner: false,
     new: false,
@@ -32,13 +45,32 @@ static STRING_DEFAULTS: Resolved = Resolved {
     partial_ord: true,
     ord: true,
     display: true,
+    to_string: true,
     debug: true,
     as_bytes: true,
-    borrow: true,
+    borrow_string: true,
     as_ref: true,
     into_inner: true,
     new: true,
     as_str: true,
+};
+
+static NUMBER_DEFAULTS: Resolved = Resolved {
+    clone: true,
+    hash: true,
+    partial_eq: true,
+    eq: true,
+    partial_ord: true,
+    ord: true,
+    display: true,
+    to_string: true,
+    debug: true,
+    as_bytes: false,
+    borrow_string: false,
+    as_ref: false,
+    into_inner: true,
+    new: true,
+    as_str: false,
 };
 
 struct KnownTypeInfo {
@@ -98,6 +130,78 @@ fn build_defaults() -> Vec<KnownTypeInfo> {
         KnownTypes::String,
         &STRING_DEFAULTS,
         vec!["String", "std::string::String", "::std::string::String"],
+    ));
+
+    result.push(KnownTypeInfo::new(
+        KnownTypes::I8,
+        &NUMBER_DEFAULTS,
+        vec!["i8", "std::i8"],
+    ));
+
+    result.push(KnownTypeInfo::new(
+        KnownTypes::U8,
+        &NUMBER_DEFAULTS,
+        vec!["u8", "std::u8"],
+    ));
+
+    result.push(KnownTypeInfo::new(
+        KnownTypes::I16,
+        &NUMBER_DEFAULTS,
+        vec!["i16", "std::i16"],
+    ));
+
+    result.push(KnownTypeInfo::new(
+        KnownTypes::U16,
+        &NUMBER_DEFAULTS,
+        vec!["u16", "std::u16"],
+    ));
+
+    result.push(KnownTypeInfo::new(
+        KnownTypes::I32,
+        &NUMBER_DEFAULTS,
+        vec!["i32", "std::i32"],
+    ));
+
+    result.push(KnownTypeInfo::new(
+        KnownTypes::U32,
+        &NUMBER_DEFAULTS,
+        vec!["u32", "std::u32"],
+    ));
+
+    result.push(KnownTypeInfo::new(
+        KnownTypes::I64,
+        &NUMBER_DEFAULTS,
+        vec!["i64", "std::i64"],
+    ));
+
+    result.push(KnownTypeInfo::new(
+        KnownTypes::U64,
+        &NUMBER_DEFAULTS,
+        vec!["u64", "std::u64"],
+    ));
+
+    result.push(KnownTypeInfo::new(
+        KnownTypes::I128,
+        &NUMBER_DEFAULTS,
+        vec!["i128", "std::i128"],
+    ));
+
+    result.push(KnownTypeInfo::new(
+        KnownTypes::U128,
+        &NUMBER_DEFAULTS,
+        vec!["u128", "std::u128"],
+    ));
+
+    result.push(KnownTypeInfo::new(
+        KnownTypes::ISize,
+        &NUMBER_DEFAULTS,
+        vec!["isize", "std::isize"],
+    ));
+
+    result.push(KnownTypeInfo::new(
+        KnownTypes::USize,
+        &NUMBER_DEFAULTS,
+        vec!["usize", "std::usize"],
     ));
 
     result
