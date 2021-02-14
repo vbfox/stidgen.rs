@@ -158,10 +158,10 @@ pub fn into_inner(name: &Ident, inner_type: &Type) -> TokenStream2 {
         }
 
         #[automatically_derived]
-        impl ::std::convert::Into<#inner_type> for #name {
+        impl ::std::convert::From<#name> for #inner_type {
             #[inline]
-            fn into(self) -> #inner_type {
-                self.0
+            fn from(value: #name) -> #inner_type {
+                value.0
             }
         }
     }
