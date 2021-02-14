@@ -15,8 +15,8 @@ fn eq() {
     let id = FooId::new("bar");
     assert_eq!(FooId::new("bar"), id);
     assert_ne!(FooId::new("baz"), id);
-    assert!(FooId::new("bar") == id, true);
-    assert!(FooId::new("baz") != id, true);
+    assert!(FooId::new("bar") == id);
+    assert!(FooId::new("baz") != id);
 }
 
 #[test]
