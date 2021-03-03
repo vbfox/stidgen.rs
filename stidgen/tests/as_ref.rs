@@ -1,9 +1,9 @@
 use std::convert::AsRef;
-use stidgen::string_id;
+use stidgen::id;
 
 #[test]
 fn string_as_ref_str_impl() {
-    #[string_id]
+    #[id]
     struct FooId(String);
 
     static_assertions::assert_impl_all!(FooId: AsRef<str>);
@@ -11,7 +11,7 @@ fn string_as_ref_str_impl() {
 
 #[test]
 fn string_as_ref_u8_impl() {
-    #[string_id]
+    #[id]
     struct FooId(String);
 
     static_assertions::assert_impl_all!(FooId: AsRef<[u8]>);
@@ -19,7 +19,7 @@ fn string_as_ref_u8_impl() {
 
 #[test]
 fn string_as_ref_str() {
-    #[string_id]
+    #[id]
     struct FooId(String);
 
     let id = FooId::new("bar");
@@ -29,7 +29,7 @@ fn string_as_ref_str() {
 
 #[test]
 fn string_as_ref_u8() {
-    #[string_id]
+    #[id]
     struct FooId(String);
 
     let id = FooId::new("bar");
@@ -39,7 +39,7 @@ fn string_as_ref_u8() {
 
 #[test]
 fn string_as_bytes() {
-    #[string_id]
+    #[id]
     struct FooId(String);
 
     let id = FooId::new("bar");

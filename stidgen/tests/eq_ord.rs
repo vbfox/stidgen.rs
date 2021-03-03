@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
-use stidgen::string_id;
+use stidgen::id;
 
-#[string_id]
+#[id]
 struct TestStringId(String);
 
 #[test]
@@ -55,7 +55,7 @@ fn string_ord() {
 
 // ----
 
-#[string_id]
+#[id]
 struct TestI32Id(i32);
 
 #[test]

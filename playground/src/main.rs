@@ -1,15 +1,15 @@
 use std::borrow::Borrow;
 use std::convert::AsRef;
-use stidgen::string_id;
+use stidgen::id;
 use uuid::Uuid;
 
-#[string_id()]
+#[id]
 pub struct FooStringId(String);
 
-#[string_id()]
+#[id]
 pub struct FooI32Id(i32);
 
-#[string_id()]
+#[id]
 pub struct FooGuidId(Uuid);
 
 fn with_str(_s: &str) {}

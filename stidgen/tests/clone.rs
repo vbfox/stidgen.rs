@@ -1,8 +1,8 @@
-use stidgen::string_id;
+use stidgen::id;
 
 #[test]
 fn clone_impl() {
-    #[string_id]
+    #[id]
     struct FooId(String);
 
     static_assertions::assert_impl_all!(FooId: Clone);
@@ -10,7 +10,7 @@ fn clone_impl() {
 
 #[test]
 fn clone_id() {
-    #[string_id]
+    #[id]
     struct FooId(String);
 
     fn consume(id: FooId) {

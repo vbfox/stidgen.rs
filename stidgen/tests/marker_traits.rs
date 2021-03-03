@@ -1,6 +1,6 @@
-use stidgen::string_id;
+use stidgen::id;
 
-#[string_id]
+#[id]
 struct FooId(String);
 
 #[test]

@@ -1,9 +1,9 @@
 use std::fmt::Debug;
-use stidgen::string_id;
+use stidgen::id;
 
 #[test]
 fn debug_impl() {
-    #[string_id]
+    #[id]
     struct FooId(String);
 
     static_assertions::assert_impl_all!(FooId: Debug);
@@ -11,7 +11,7 @@ fn debug_impl() {
 
 #[test]
 fn debug_string() {
-    #[string_id]
+    #[id]
     struct FooId(String);
 
     let id = FooId::new("bar");

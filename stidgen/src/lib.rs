@@ -142,7 +142,7 @@ fn impl_id_type(attr_ast: &syn::AttributeArgs, item_ast: &syn::ItemStruct) -> To
 }
 
 #[proc_macro_attribute]
-pub fn string_id(attr: TokenStream, item: TokenStream) -> TokenStream {
+pub fn id(attr: TokenStream, item: TokenStream) -> TokenStream {
     // Construct a representation of Rust code as a syntax tree
     // that we can manipulate
     let attr_ast = parse_macro_input!(attr as syn::AttributeArgs);

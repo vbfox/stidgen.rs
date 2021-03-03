@@ -1,4 +1,4 @@
-use stidgen::string_id;
+use stidgen::id;
 
 mod std {
     pub mod cmp {
@@ -7,41 +7,41 @@ mod std {
 }
 
 // This would fail if the macro simply used 'std'
-#[string_id]
+#[id]
 struct FooId(String);
 
-#[string_id]
+#[id]
 struct FooIdU8(u8);
 
-#[string_id]
+#[id]
 struct FooIdI8(i8);
 
-#[string_id]
+#[id]
 struct FooIdU16(u16);
 
-#[string_id]
+#[id]
 struct FooIdI16(i16);
 
-#[string_id]
+#[id]
 struct FooIdU32(u32);
 
-#[string_id]
+#[id]
 struct FooIdI32(i32);
 
-#[string_id]
+#[id]
 struct FooIdU64(u64);
 
-#[string_id]
+#[id]
 struct FooIdI64(i64);
 
-#[string_id]
+#[id]
 struct FooIdU128(u128);
 
-#[string_id]
+#[id]
 struct FooIdI128(i128);
 
-#[string_id]
+#[id]
 struct FooIdUSize(usize);
 
-#[string_id]
+#[id]
 struct FooIdISize(isize);

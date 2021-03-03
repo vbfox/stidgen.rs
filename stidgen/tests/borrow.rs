@@ -1,9 +1,9 @@
 use std::borrow::Borrow;
-use stidgen::string_id;
+use stidgen::id;
 
 #[test]
 fn borrow_impl() {
-    #[string_id]
+    #[id]
     struct FooId(String);
 
     static_assertions::assert_impl_all!(FooId: Borrow<str>);
@@ -11,7 +11,7 @@ fn borrow_impl() {
 
 #[test]
 fn borrow_string() {
-    #[string_id]
+    #[id]
     struct FooId(String);
 
     let id = FooId::new("bar");

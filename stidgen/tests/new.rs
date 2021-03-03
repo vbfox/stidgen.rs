@@ -1,8 +1,8 @@
-use stidgen::string_id;
+use stidgen::id;
 
 #[test]
 fn new_string() {
-    #[string_id]
+    #[id]
     struct FooId(String);
 
     let id = FooId::new("bar".to_string());
@@ -11,7 +11,7 @@ fn new_string() {
 
 #[test]
 fn new_str() {
-    #[string_id]
+    #[id]
     struct FooId(String);
 
     let id = FooId::new("bar");
@@ -28,7 +28,7 @@ fn new_into_string() {
         }
     }
 
-    #[string_id]
+    #[id]
     struct FooId(String);
 
     let id = FooId::new(IntoString {});
@@ -39,7 +39,7 @@ fn new_into_string() {
 
 #[test]
 fn new_i32() {
-    #[string_id]
+    #[id]
     struct FooId(i32);
 
     let id = FooId::new(42);
@@ -56,7 +56,7 @@ fn new_into_i32() {
         }
     }
 
-    #[string_id]
+    #[id]
     struct FooId(i32);
 
     let id = FooId::new(IntoNumber {});
