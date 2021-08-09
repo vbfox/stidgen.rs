@@ -97,6 +97,6 @@ pub struct Resolved {
     pub as_str: bool,
 }
 
-pub fn parse_options(_attr_ast: &syn::AttributeArgs) -> Options {
+pub fn parse(_attr_ast: &syn::AttributeArgs) -> Options {
     Options::default()
 }
