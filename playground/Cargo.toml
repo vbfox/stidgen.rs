@@ -3,6 +3,7 @@ name = "playground"
 version = "0.1.0"
 authors = ["Julien Roncaglia <julien@roncaglia.fr>"]
 edition = "2018"
+publish = false
 
 [dependencies]
 stidgen = { path = "../stidgen" }

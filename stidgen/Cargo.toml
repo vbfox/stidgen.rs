@@ -3,6 +3,12 @@ name = "stidgen"
 version = "0.1.0"
 authors = ["Julien Roncaglia <julien@roncaglia.fr>"]
 edition = "2018"
+description = "Strongly Typed ID types macro"
+readme = "../Readme.md"
+homepage = "https://github.com/vbfox/stidgen.rs"
+repository = "https://github.com/vbfox/stidgen.rs"
+license = "MIT"
+keywords = ["rust-patterns", "data-structures"]
 
 [lib]
 proc-macro = true

@@ -1,4 +1,4 @@
-# Strongly Typed ID type Generator
+# Strongly Typed ID types macro
 
 A macro to simplify usage of srongly type ID types instead of plain
 `String`, `u64` or `Guid` in Rust codebases.
