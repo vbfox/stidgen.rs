@@ -39,3 +39,8 @@ macro proposes using it has the following advantages:
 ### Default types
 
 For unknown types all features are disabled by default but some types like `String` have smart defaults.
+
+```rust
+#[id(Clone, Hash, PartialEq, Eq, PartialOrd, Ord, Display, ToString, Debug, AsBytes, ...)]
+pub struct Id(String);
+```
