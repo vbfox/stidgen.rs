@@ -1,4 +1,4 @@
-use crate::options::Resolved;
+use crate::{options::Resolved, type_match::*};
 use once_cell::sync::Lazy;
 use syn::Type;
 
@@ -95,93 +95,47 @@ static UUID_DEFAULTS: Resolved = Resolved {
 struct KnownTypeInfo {
     pub known_type: KnownTypes,
     pub default_options: &'static Resolved,
-    pub types: Vec<String>,
+    pub matchable: &'static MatchableType,
 }
 
 impl KnownTypeInfo {
     pub fn new(
         known_type: KnownTypes,
         default_options: &'static Resolved,
-        parseable_types: Vec<&str>,
+        matchable: &'static MatchableType,
     ) -> KnownTypeInfo {
-        #[cfg(debug_assertions)]
-        {
-            let parsed_types = parseable_types
-                .iter()
-                .map(|t| syn::parse_str(t).expect("Hardcoded types should parse"))
-                .collect::<Vec<syn::Type>>();
-
-            for ty in &parsed_types {
-                match try_get_path_type(&ty) {
-                    Some(_) => {}
-                    None => panic!("Only Path types should be registered as known"),
-                }
-            }
-        }
-
-        let types = parseable_types
-            .into_iter()
-            .map(ToString::to_string)
-            .collect::<Vec<_>>();
-
         KnownTypeInfo {
             known_type,
             default_options,
-            types,
+            matchable,
         }
     }
+}
 
-    fn types_iter(&self) -> impl Iterator<Item = Type> + '_ {
-        self.types
-            .iter()
-            .map(|t| syn::parse_str(t).expect("Hardcoded types should parse"))
-    }
-
-    pub fn matches(&self, t: &Type) -> bool {
-        self.types_iter().any(|m| m == *t)
+impl PartialEq<Type> for KnownTypeInfo {
+    fn eq(&self, other: &Type) -> bool {
+        self.matchable == other
     }
 }
 
-fn build_defaults() -> Vec<KnownTypeInfo> {
+static KNOWN_TYPE_INFOS: Lazy<Vec<KnownTypeInfo>> = Lazy::new(|| {
     vec![
-        KnownTypeInfo::new(
-            KnownTypes::String,
-            &STRING_DEFAULTS,
-            vec!["String", "std::string::String", "::std::string::String"],
-        ),
-        KnownTypeInfo::new(KnownTypes::I8, &NUMBER_DEFAULTS, vec!["i8", "std::i8"]),
-        KnownTypeInfo::new(KnownTypes::U8, &NUMBER_DEFAULTS, vec!["u8", "std::u8"]),
-        KnownTypeInfo::new(KnownTypes::I16, &NUMBER_DEFAULTS, vec!["i16", "std::i16"]),
-        KnownTypeInfo::new(KnownTypes::U16, &NUMBER_DEFAULTS, vec!["u16", "std::u16"]),
-        KnownTypeInfo::new(KnownTypes::I32, &NUMBER_DEFAULTS, vec!["i32", "std::i32"]),
-        KnownTypeInfo::new(KnownTypes::U32, &NUMBER_DEFAULTS, vec!["u32", "std::u32"]),
-        KnownTypeInfo::new(KnownTypes::I64, &NUMBER_DEFAULTS, vec!["i64", "std::i64"]),
-        KnownTypeInfo::new(KnownTypes::U64, &NUMBER_DEFAULTS, vec!["u64", "std::u64"]),
-        KnownTypeInfo::new(
-            KnownTypes::I128,
-            &NUMBER_DEFAULTS,
-            vec!["i128", "std::i128"],
-        ),
-        KnownTypeInfo::new(
-            KnownTypes::U128,
-            &NUMBER_DEFAULTS,
-            vec!["u128", "std::u128"],
-        ),
-        KnownTypeInfo::new(
-            KnownTypes::ISize,
-            &NUMBER_DEFAULTS,
-            vec!["isize", "std::isize"],
-        ),
-        KnownTypeInfo::new(
-            KnownTypes::USize,
-            &NUMBER_DEFAULTS,
-            vec!["usize", "std::usize"],
-        ),
-        KnownTypeInfo::new(KnownTypes::Uuid, &UUID_DEFAULTS, vec!["Uuid", "uuid::Uuid"]),
+        KnownTypeInfo::new(KnownTypes::String, &STRING_DEFAULTS, &*TYPE_STRING),
+        KnownTypeInfo::new(KnownTypes::I8, &NUMBER_DEFAULTS, &*TYPE_I8),
+        KnownTypeInfo::new(KnownTypes::U8, &NUMBER_DEFAULTS, &*TYPE_U8),
+        KnownTypeInfo::new(KnownTypes::I16, &NUMBER_DEFAULTS, &*TYPE_I16),
+        KnownTypeInfo::new(KnownTypes::U16, &NUMBER_DEFAULTS, &*TYPE_U16),
+        KnownTypeInfo::new(KnownTypes::I32, &NUMBER_DEFAULTS, &*TYPE_I32),
+        KnownTypeInfo::new(KnownTypes::U32, &NUMBER_DEFAULTS, &*TYPE_U32),
+        KnownTypeInfo::new(KnownTypes::I64, &NUMBER_DEFAULTS, &*TYPE_I64),
+        KnownTypeInfo::new(KnownTypes::U64, &NUMBER_DEFAULTS, &*TYPE_U64),
+        KnownTypeInfo::new(KnownTypes::I128, &NUMBER_DEFAULTS, &*TYPE_I128),
+        KnownTypeInfo::new(KnownTypes::U128, &NUMBER_DEFAULTS, &*TYPE_U128),
+        KnownTypeInfo::new(KnownTypes::ISize, &NUMBER_DEFAULTS, &*TYPE_ISIZE),
+        KnownTypeInfo::new(KnownTypes::USize, &NUMBER_DEFAULTS, &*TYPE_USIZE),
+        KnownTypeInfo::new(KnownTypes::Uuid, &UUID_DEFAULTS, &*TYPE_UUID),
     ]
-}
-
-static KNOWN_TYPE_INFOS: Lazy<Vec<KnownTypeInfo>> = Lazy::new(build_defaults);
+});
 
 /// Get the type if it is a `Type::Path`, extract the `Type::Path` if wrapped in `Type::Paren`, `None` otherwise.
 fn try_get_path_type(ty: &Type) -> Option<&Type> {
@@ -195,7 +149,7 @@ fn try_get_path_type(ty: &Type) -> Option<&Type> {
 impl KnownTypeInfo {
     pub fn from_type(ty: &Type) -> Option<&KnownTypeInfo> {
         let path_type = try_get_path_type(ty)?;
-        KNOWN_TYPE_INFOS.iter().find(|ti| ti.matches(path_type))
+        KNOWN_TYPE_INFOS.iter().find(|ti| *ti == path_type)
     }
 }
 

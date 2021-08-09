@@ -6,6 +6,7 @@ extern crate proc_macro;
 mod impls;
 mod known_types;
 mod options;
+mod type_match;
 
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;

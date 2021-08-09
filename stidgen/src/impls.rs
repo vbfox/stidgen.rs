@@ -84,6 +84,7 @@ pub fn display(name: &Ident) -> TokenStream2 {
 }
 
 pub fn to_string(name: &Ident, inner_type: &Type) -> TokenStream2 {
+    //panic!("EQ {:?} - {:?} - {:?}", inner_type, inner_type.type_id(), TypeId::of::<String>());
     if inner_type.type_id() == TypeId::of::<String>() {
         quote! {
             #[automatically_derived]

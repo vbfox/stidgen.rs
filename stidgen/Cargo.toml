@@ -21,3 +21,4 @@ once_cell = "1.5.2"
 
 [dev-dependencies]
 static_assertions = "1.1.0"
+macrotest = "1"
