@@ -96,3 +96,7 @@ pub struct Resolved {
     pub new: bool,
     pub as_str: bool,
 }
+
+pub fn parse_options(_attr_ast: &syn::AttributeArgs) -> Options {
+    Options::default()
+}
