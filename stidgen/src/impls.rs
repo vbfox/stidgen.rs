@@ -1,8 +1,8 @@
-use std::any::{Any, TypeId};
-
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
 use syn::{self, Ident, Type};
+
+use crate::type_match::TYPE_STRING;
 
 pub fn clone(name: &Ident) -> TokenStream2 {
     quote! {
@@ -84,8 +84,7 @@ pub fn display(name: &Ident) -> TokenStream2 {
 }
 
 pub fn to_string(name: &Ident, inner_type: &Type) -> TokenStream2 {
-    //panic!("EQ {:?} - {:?} - {:?}", inner_type, inner_type.type_id(), TypeId::of::<String>());
-    if inner_type.type_id() == TypeId::of::<String>() {
+    if &*TYPE_STRING == inner_type {
         quote! {
             #[automatically_derived]
             impl #name {
