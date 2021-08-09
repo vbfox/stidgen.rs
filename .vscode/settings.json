@@ -1,19 +1,16 @@
 {
-    "rust-analyzer.cargo.allFeatures": true,
-    "rust-analyzer.checkOnSave.allFeatures": true,
-    "rust-analyzer.checkOnSave.extraArgs": [
-      "--target-dir",
-      "target/check"
-    ],
-    "search.exclude": {
-      "/target": true
-    },
-    "files.associations": {
-      "Makefile.lib": "makefile"
-    },
-    "files.insertFinalNewline":true,
-    "files.trimTrailingWhitespace": true,
-    "[markdown]": {
-      "files.trimTrailingWhitespace": false
-    },
+  "rust-analyzer.cargo.allFeatures": true,
+  "rust-analyzer.checkOnSave.allFeatures": true,
+  "rust-analyzer.checkOnSave.extraArgs": ["--target-dir", "target/check"],
+  "search.exclude": {
+    "/target": true
+  },
+  "files.associations": {
+    "Makefile.lib": "makefile"
+  },
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "[markdown]": {
+    "files.trimTrailingWhitespace": false
   }
+}
