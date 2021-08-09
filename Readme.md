@@ -24,17 +24,17 @@ macro proposes using it has the following advantages:
 ### Settings
 
 * `Defaults`/`NoDefaults`: Enable or disable defaults for known types
-* `Clone`/`NoClone`: Enable or disable deriving `std::clone::Clone`
-* `Hash`/`NoHash`: Enable or disable deriving `std::hash::Hash`
-* `PartialEq`/`NoPartialEq`: Enable or disable deriving `std::cmp::PartialEq`
-* `Eq`/`NoEq`: Enable or disable deriving `std::cmp::Eq`
-* `PartialOrd`/`NoPartialOrd`: Enable or disable deriving `std::cmp::PartialOrd`
-* `Ord`/`NoOrd`: Enable or disable deriving `std::cmp::Ord`
-* `Display`/`NoDisplay`: Enable or disable deriving `std::cmp::Display` and adding a `to_string` method
-* `Debug`/`NoDebug`: Enable or disable deriving `std::cmp::Display`
+* `Clone`/`NoClone`: Enable or disable deriving [`std::clone::Clone`](https://doc.rust-lang.org/std/clone/trait.Clone.html)
+* `Hash`/`NoHash`: Enable or disable deriving [`std::hash::Hash`](https://doc.rust-lang.org/std/hash/trait.Hash.html)
+* `PartialEq`/`NoPartialEq`: Enable or disable deriving [`std::cmp::PartialEq`](https://doc.rust-lang.org/std/cmp/trait.PartialEq.html)
+* `Eq`/`NoEq`: Enable or disable deriving [`std::cmp::Eq`](https://doc.rust-lang.org/std/cmp/trait.Eq.html)
+* `PartialOrd`/`NoPartialOrd`: Enable or disable deriving [`std::cmp::PartialOrd`](https://doc.rust-lang.org/std/cmp/trait.PartialOrd.html)
+* `Ord`/`NoOrd`: Enable or disable deriving [`std::cmp::Ord`](https://doc.rust-lang.org/std/cmp/trait.Ord.html)
+* `Display`/`NoDisplay`: Enable or disable deriving [`std::fmt::Display`](https://doc.rust-lang.org/std/fmt/trait.Display.html) and adding a `to_string` method
+* `Debug`/`NoDebug`: Enable or disable deriving [`std::fmt::Debug`](https://doc.rust-lang.org/std/fmt/trait.Debug.html)
 * `AsBytes`/`NoAsBytes`: Enable or disable deriving `std::convert::AsRef<[u8]>` and adding a `as_bytes` method
-* `Borrow`/`NoBorrow`: Enable or disable deriving `std::borrow::Borrow`
-* `AsRef`/`NoAsRef`: Enable or disable deriving `std::convert::AsRef`
+* `Borrow`/`NoBorrow`: Enable or disable deriving [`std::borrow::Borrow`](https://doc.rust-lang.org/std/borrow/trait.Borrow.html)
+* `AsRef`/`NoAsRef`: Enable or disable deriving [`std::convert::AsRef`](https://doc.rust-lang.org/std/convert/trait.AsRef.html)
 
 ### Default types
 
