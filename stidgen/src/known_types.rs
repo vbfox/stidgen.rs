@@ -1,4 +1,10 @@
-use crate::{options::Resolved, type_match::*};
+use crate::{
+    options::Resolved,
+    type_match::{
+        MatchableType, TYPE_I128, TYPE_I16, TYPE_I32, TYPE_I64, TYPE_I8, TYPE_ISIZE, TYPE_STRING,
+        TYPE_U128, TYPE_U16, TYPE_U32, TYPE_U64, TYPE_U8, TYPE_USIZE, TYPE_UUID,
+    },
+};
 use once_cell::sync::Lazy;
 use syn::Type;
 
