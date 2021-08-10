@@ -147,7 +147,7 @@ static KNOWN_TYPE_INFOS: Lazy<Vec<KnownTypeInfo>> = Lazy::new(|| {
 fn try_get_path_type(ty: &Type) -> Option<&Type> {
     match ty {
         Type::Paren(paren) => try_get_path_type(&paren.elem),
-        Type::Path(_) => Some(&ty),
+        Type::Path(_) => Some(ty),
         _ => None,
     }
 }

@@ -9,7 +9,7 @@ pub struct MatchableType {
 fn try_get_path_type(ty: &Type) -> Option<&Type> {
     match ty {
         Type::Paren(paren) => try_get_path_type(&paren.elem),
-        Type::Path(_) => Some(&ty),
+        Type::Path(_) => Some(ty),
         _ => None,
     }
 }
@@ -24,7 +24,7 @@ impl MatchableType {
                 .collect::<Vec<syn::Type>>();
 
             for ty in &parsed_types {
-                match try_get_path_type(&ty) {
+                match try_get_path_type(ty) {
                     Some(_) => {}
                     None => panic!("Only Path types should be registered as known"),
                 }

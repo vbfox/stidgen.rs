@@ -77,8 +77,8 @@ impl<'a> Stidgen<'a> {
     ) -> Self {
         Self {
             resolved_options,
-            item_ast,
             type_info,
+            item_ast,
         }
     }
 
