@@ -3,11 +3,20 @@
 
 extern crate proc_macro;
 
+/*
+
+TODO:
+- Do the option parsing
+- to_string should be separate from Display user-side too
+
+*/
+
 mod impls;
 mod known_types;
 mod options;
 mod type_match;
 
+use known_types::KnownTypeInfo;
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
@@ -33,6 +42,7 @@ enum TypeInfoError {
 struct IdTypeInfo {
     name: Ident,
     inner_type: Type,
+    known_type: Option<KnownTypeInfo>,
 }
 
 impl IdTypeInfo {
@@ -49,9 +59,13 @@ impl IdTypeInfo {
                         .expect("Field count was checked")
                         .clone();
 
+                    let inner_type = field.ty;
+                    let known_type = KnownTypeInfo::from_type(&inner_type).cloned();
+
                     Ok(Self {
                         name: item_ast.ident.clone(),
-                        inner_type: field.ty,
+                        inner_type,
+                        known_type,
                     })
                 } else {
                     Err(TypeInfoError::InvalidFieldCount {
@@ -85,6 +99,7 @@ impl<'a> Stidgen<'a> {
     pub fn to_tokens(&self) -> TokenStream2 {
         let name = &(self.type_info.name);
         let inner_type = &(self.type_info.inner_type);
+        let known_type = self.type_info.known_type.as_ref().map(|k| k.known_type);
         let options = self.resolved_options;
         let item_ast = self.item_ast;
 
@@ -95,7 +110,7 @@ impl<'a> Stidgen<'a> {
         let ord = add_impl_if_enabled!(options.ord, impls::ord(name));
         let partial_ord = add_impl_if_enabled!(options.partial_ord, impls::partial_ord(name));
         let display = add_impl_if_enabled!(options.display, impls::display(name));
-        let to_string = add_impl_if_enabled!(options.to_string, impls::to_string(name, inner_type));
+        let to_string = add_impl_if_enabled!(options.to_string, impls::to_string(name, known_type));
         let debug = add_impl_if_enabled!(options.debug, impls::debug(name));
         let as_bytes = add_impl_if_enabled!(options.as_bytes, impls::as_bytes(name));
         let into_inner =

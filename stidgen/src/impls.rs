@@ -2,7 +2,7 @@ use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
 use syn::{self, Ident, Type};
 
-use crate::type_match::TYPE_STRING;
+use crate::known_types::KnownType;
 
 pub fn clone(name: &Ident) -> TokenStream2 {
     quote! {
@@ -83,8 +83,8 @@ pub fn display(name: &Ident) -> TokenStream2 {
     }
 }
 
-pub fn to_string(name: &Ident, inner_type: &Type) -> TokenStream2 {
-    if &*TYPE_STRING == inner_type {
+pub fn to_string(name: &Ident, known_type: Option<KnownType>) -> TokenStream2 {
+    if known_type == Some(KnownType::String) {
         quote! {
             #[automatically_derived]
             impl #name {

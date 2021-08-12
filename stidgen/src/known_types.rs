@@ -8,8 +8,8 @@ use crate::{
 use once_cell::sync::Lazy;
 use syn::Type;
 
-#[derive(Debug, Clone, Copy)]
-enum KnownTypes {
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum KnownType {
     String,
     I8,
     U8,
@@ -98,15 +98,16 @@ static UUID_DEFAULTS: Resolved = Resolved {
     as_str: false,
 };
 
-struct KnownTypeInfo {
-    pub known_type: KnownTypes,
+#[derive(Clone)]
+pub struct KnownTypeInfo {
+    pub known_type: KnownType,
     pub default_options: &'static Resolved,
     pub matchable: &'static MatchableType,
 }
 
 impl KnownTypeInfo {
     pub fn new(
-        known_type: KnownTypes,
+        known_type: KnownType,
         default_options: &'static Resolved,
         matchable: &'static MatchableType,
     ) -> KnownTypeInfo {
@@ -126,20 +127,20 @@ impl PartialEq<Type> for KnownTypeInfo {
 
 static KNOWN_TYPE_INFOS: Lazy<Vec<KnownTypeInfo>> = Lazy::new(|| {
     vec![
-        KnownTypeInfo::new(KnownTypes::String, &STRING_DEFAULTS, &*TYPE_STRING),
-        KnownTypeInfo::new(KnownTypes::I8, &NUMBER_DEFAULTS, &*TYPE_I8),
-        KnownTypeInfo::new(KnownTypes::U8, &NUMBER_DEFAULTS, &*TYPE_U8),
-        KnownTypeInfo::new(KnownTypes::I16, &NUMBER_DEFAULTS, &*TYPE_I16),
-        KnownTypeInfo::new(KnownTypes::U16, &NUMBER_DEFAULTS, &*TYPE_U16),
-        KnownTypeInfo::new(KnownTypes::I32, &NUMBER_DEFAULTS, &*TYPE_I32),
-        KnownTypeInfo::new(KnownTypes::U32, &NUMBER_DEFAULTS, &*TYPE_U32),
-        KnownTypeInfo::new(KnownTypes::I64, &NUMBER_DEFAULTS, &*TYPE_I64),
-        KnownTypeInfo::new(KnownTypes::U64, &NUMBER_DEFAULTS, &*TYPE_U64),
-        KnownTypeInfo::new(KnownTypes::I128, &NUMBER_DEFAULTS, &*TYPE_I128),
-        KnownTypeInfo::new(KnownTypes::U128, &NUMBER_DEFAULTS, &*TYPE_U128),
-        KnownTypeInfo::new(KnownTypes::ISize, &NUMBER_DEFAULTS, &*TYPE_ISIZE),
-        KnownTypeInfo::new(KnownTypes::USize, &NUMBER_DEFAULTS, &*TYPE_USIZE),
-        KnownTypeInfo::new(KnownTypes::Uuid, &UUID_DEFAULTS, &*TYPE_UUID),
+        KnownTypeInfo::new(KnownType::String, &STRING_DEFAULTS, &*TYPE_STRING),
+        KnownTypeInfo::new(KnownType::I8, &NUMBER_DEFAULTS, &*TYPE_I8),
+        KnownTypeInfo::new(KnownType::U8, &NUMBER_DEFAULTS, &*TYPE_U8),
+        KnownTypeInfo::new(KnownType::I16, &NUMBER_DEFAULTS, &*TYPE_I16),
+        KnownTypeInfo::new(KnownType::U16, &NUMBER_DEFAULTS, &*TYPE_U16),
+        KnownTypeInfo::new(KnownType::I32, &NUMBER_DEFAULTS, &*TYPE_I32),
+        KnownTypeInfo::new(KnownType::U32, &NUMBER_DEFAULTS, &*TYPE_U32),
+        KnownTypeInfo::new(KnownType::I64, &NUMBER_DEFAULTS, &*TYPE_I64),
+        KnownTypeInfo::new(KnownType::U64, &NUMBER_DEFAULTS, &*TYPE_U64),
+        KnownTypeInfo::new(KnownType::I128, &NUMBER_DEFAULTS, &*TYPE_I128),
+        KnownTypeInfo::new(KnownType::U128, &NUMBER_DEFAULTS, &*TYPE_U128),
+        KnownTypeInfo::new(KnownType::ISize, &NUMBER_DEFAULTS, &*TYPE_ISIZE),
+        KnownTypeInfo::new(KnownType::USize, &NUMBER_DEFAULTS, &*TYPE_USIZE),
+        KnownTypeInfo::new(KnownType::Uuid, &UUID_DEFAULTS, &*TYPE_UUID),
     ]
 });
 
