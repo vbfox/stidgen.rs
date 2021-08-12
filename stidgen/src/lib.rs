@@ -18,9 +18,11 @@ mod type_match;
 
 use known_types::KnownTypeInfo;
 use proc_macro::TokenStream;
-use proc_macro2::TokenStream as TokenStream2;
+use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::quote;
+use syn::spanned::Spanned;
 use syn::{self, parse_macro_input, Ident, Type};
+use thiserror::Error;
 
 macro_rules! add_impl_if_enabled {
     ( $option:expr, $impl:expr ) => {{
@@ -32,11 +34,34 @@ macro_rules! add_impl_if_enabled {
     }};
 }
 
-#[derive(Debug)]
+#[derive(Error, Debug)]
 enum TypeInfoError {
-    NamedFields,
-    UnitFields,
-    InvalidFieldCount { count: usize },
+    // struct Foo { x: i32 };
+    #[error("expected an unamed field but found named ones")]
+    NamedFields { span: Span },
+    // struct Foo;
+    #[error("expected an unamed field but found none")]
+    UnitFields { span: Span },
+    // struct Foo(i32, i32);
+    #[error("expected a single field but found {count}")]
+    InvalidFieldCount { count: usize, span: Span },
+}
+
+impl Spanned for TypeInfoError {
+    fn span(&self) -> Span {
+        match self {
+            TypeInfoError::NamedFields { span, .. } => span,
+            TypeInfoError::UnitFields { span, .. } => span,
+            TypeInfoError::InvalidFieldCount { span, .. } => span,
+        }
+        .clone()
+    }
+}
+
+impl From<TypeInfoError> for syn::Error {
+    fn from(err: TypeInfoError) -> Self {
+        syn::Error::new(err.span(), err)
+    }
 }
 
 struct IdTypeInfo {
@@ -48,8 +73,12 @@ struct IdTypeInfo {
 impl IdTypeInfo {
     pub fn new(item_ast: &syn::ItemStruct) -> Result<Self, TypeInfoError> {
         match item_ast.fields {
-            syn::Fields::Named(_) => Err(TypeInfoError::NamedFields),
-            syn::Fields::Unit => Err(TypeInfoError::UnitFields),
+            syn::Fields::Named(_) => Err(TypeInfoError::NamedFields {
+                span: item_ast.fields.span(),
+            }),
+            syn::Fields::Unit => Err(TypeInfoError::UnitFields {
+                span: item_ast.ident.span(),
+            }),
             syn::Fields::Unnamed(_) => {
                 if item_ast.fields.len() == 1 {
                     let field = item_ast
@@ -70,6 +99,7 @@ impl IdTypeInfo {
                 } else {
                     Err(TypeInfoError::InvalidFieldCount {
                         count: item_ast.fields.len(),
+                        span: item_ast.fields.span(),
                     })
                 }
             }
@@ -145,16 +175,19 @@ impl<'a> Stidgen<'a> {
 
 fn get_options(attr_ast: &syn::AttributeArgs, id_type_info: &IdTypeInfo) -> options::Resolved {
     let user_options = options::parse(attr_ast);
-    let defaults =  known_types::get_default_options(id_type_info.known_type.as_ref());
+    let defaults = known_types::get_default_options(id_type_info.known_type.as_ref());
     user_options.resolve(defaults)
 }
 
-fn impl_id_type(attr_ast: &syn::AttributeArgs, item_ast: &syn::ItemStruct) -> TokenStream {
-    let id_type_info = IdTypeInfo::new(item_ast).unwrap(); // TODO: We resolve that twice...
+fn impl_id_type(
+    attr_ast: &syn::AttributeArgs,
+    item_ast: &syn::ItemStruct,
+) -> syn::Result<TokenStream2> {
+    let id_type_info = IdTypeInfo::new(item_ast)?;
     let options = get_options(attr_ast, &id_type_info);
     let gen = Stidgen::new(item_ast, &options, id_type_info);
 
-    gen.to_tokens().into()
+    Ok(gen.to_tokens())
 }
 
 #[proc_macro_attribute]
@@ -162,8 +195,11 @@ pub fn id(attr: TokenStream, item: TokenStream) -> TokenStream {
     // Construct a representation of Rust code as a syntax tree
     // that we can manipulate
     let attr_ast = parse_macro_input!(attr as syn::AttributeArgs);
+    // TODO: ? Attribute::parse_meta
     let item_ast = parse_macro_input!(item as syn::ItemStruct);
 
     // Build the trait implementation
     impl_id_type(&attr_ast, &item_ast)
+        .unwrap_or_else(|err| err.to_compile_error())
+        .into()
 }
