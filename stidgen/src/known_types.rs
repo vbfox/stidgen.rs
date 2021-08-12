@@ -160,8 +160,8 @@ impl KnownTypeInfo {
     }
 }
 
-pub fn get_defaults(for_type: &Type) -> &'static Resolved {
-    match KnownTypeInfo::from_type(for_type) {
+pub fn get_default_options(info: Option<&KnownTypeInfo>) -> &'static Resolved {
+    match info {
         Some(known_type) => known_type.default_options,
         None => &ANY_DEFAULTS,
     }

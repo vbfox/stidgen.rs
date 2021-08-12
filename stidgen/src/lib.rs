@@ -145,7 +145,7 @@ impl<'a> Stidgen<'a> {
 
 fn get_options(attr_ast: &syn::AttributeArgs, id_type_info: &IdTypeInfo) -> options::Resolved {
     let user_options = options::parse(attr_ast);
-    let defaults = known_types::get_defaults(&id_type_info.inner_type);
+    let defaults =  known_types::get_default_options(id_type_info.known_type.as_ref());
     user_options.resolve(defaults)
 }
 
