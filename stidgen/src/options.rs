@@ -1,4 +1,4 @@
-use std::{collections::HashMap};
+use std::collections::HashMap;
 
 use once_cell::sync::Lazy;
 use proc_macro2::Span;
@@ -7,7 +7,7 @@ use syn::{spanned::Spanned, Path, PathSegment};
 /// External facing options
 #[derive(Debug, Clone)]
 pub struct Options {
-    pub defaults: Option<bool>,
+    pub apply_defaults: bool,
     pub clone: Option<bool>,
     pub hash: Option<bool>,
     pub partial_eq: Option<bool>,
@@ -28,7 +28,7 @@ pub struct Options {
 impl Default for Options {
     fn default() -> Self {
         Options {
-            defaults: None,
+            apply_defaults: true,
             clone: None,
             hash: None,
             partial_eq: None,
@@ -59,7 +59,11 @@ macro_rules! resolve_one {
 
 impl Options {
     pub fn resolve(&self, defaults: &Resolved) -> Resolved {
-        let mut resolved = defaults.clone();
+        let mut resolved = if self.apply_defaults {
+            defaults.clone()
+        } else {
+            Resolved::default()
+        };
 
         resolve_one!(self, resolved, clone);
         resolve_one!(self, resolved, hash);
@@ -84,7 +88,7 @@ impl Options {
 /// Options for the generator resolved from the passed in options
 /// and the type of ID
 #[allow(clippy::struct_excessive_bools)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct Resolved {
     pub clone: bool,
     pub hash: bool,
@@ -125,6 +129,7 @@ enum OptionArg {
 
 static OPTION_NAMES: Lazy<HashMap<String, (OptionArg, bool)>> = Lazy::new(|| {
     vec![
+        ("Defaults", OptionArg::Defaults),
         ("Clone", OptionArg::Clone),
         ("Hash", OptionArg::Hash),
         ("Eq", OptionArg::Eq),
@@ -163,7 +168,7 @@ impl NegatableOptionArg {
 
     fn apply(&self, options: &mut Options) {
         match self.option {
-            OptionArg::Defaults => todo!(),
+            OptionArg::Defaults => options.apply_defaults = !self.negated,
             OptionArg::Clone => options.clone = Some(!self.negated),
             OptionArg::Hash => options.hash = Some(!self.negated),
             OptionArg::Eq => options.eq = Some(!self.negated),
