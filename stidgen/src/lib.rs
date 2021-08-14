@@ -173,10 +173,13 @@ impl<'a> Stidgen<'a> {
     }
 }
 
-fn get_options(attr_ast: &syn::AttributeArgs, id_type_info: &IdTypeInfo) -> options::Resolved {
-    let user_options = options::parse(attr_ast);
+fn get_options(
+    attr_ast: &syn::AttributeArgs,
+    id_type_info: &IdTypeInfo,
+) -> syn::Result<options::Resolved> {
+    let user_options = options::parse(attr_ast)?;
     let defaults = known_types::get_default_options(id_type_info.known_type.as_ref());
-    user_options.resolve(defaults)
+    Ok(user_options.resolve(defaults))
 }
 
 fn impl_id_type(
@@ -184,7 +187,7 @@ fn impl_id_type(
     item_ast: &syn::ItemStruct,
 ) -> syn::Result<TokenStream2> {
     let id_type_info = IdTypeInfo::new(item_ast)?;
-    let options = get_options(attr_ast, &id_type_info);
+    let options = get_options(attr_ast, &id_type_info)?;
     let gen = Stidgen::new(item_ast, &options, id_type_info);
 
     Ok(gen.to_tokens())

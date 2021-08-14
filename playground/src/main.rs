@@ -9,7 +9,7 @@ pub struct FooStringId(String);
 #[id]
 pub struct FooI32Id(i32);
 
-#[id]
+#[id(Display)]
 pub struct FooGuidId(Uuid);
 
 fn with_str(_s: &str) {}

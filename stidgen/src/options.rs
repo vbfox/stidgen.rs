@@ -1,3 +1,9 @@
+use std::{collections::HashMap};
+
+use once_cell::sync::Lazy;
+use proc_macro2::Span;
+use syn::{spanned::Spanned, Path, PathSegment};
+
 /// External facing options
 #[derive(Debug, Clone)]
 pub struct Options {
@@ -97,6 +103,125 @@ pub struct Resolved {
     pub as_str: bool,
 }
 
-pub fn parse(_attr_ast: &syn::AttributeArgs) -> Options {
-    Options::default()
+#[derive(Clone, Copy)]
+enum OptionArg {
+    Defaults,
+    Clone,
+    Hash,
+    Eq,
+    PartialEq,
+    Ord,
+    PartialOrd,
+    Display,
+    ToString,
+    Debug,
+    AsBytes,
+    BorrowString,
+    AsRef,
+    IntoInner,
+    New,
+    AsStr,
+}
+
+static OPTION_NAMES: Lazy<HashMap<String, (OptionArg, bool)>> = Lazy::new(|| {
+    vec![
+        ("Clone", OptionArg::Clone),
+        ("Hash", OptionArg::Hash),
+        ("Eq", OptionArg::Eq),
+        ("PartialEq", OptionArg::PartialEq),
+        ("Ord", OptionArg::Ord),
+        ("PartialOrd", OptionArg::PartialOrd),
+        ("Display", OptionArg::Display),
+        ("ToString", OptionArg::ToString),
+        ("Debug", OptionArg::Debug),
+        ("AsBytes", OptionArg::AsBytes),
+        ("BorrowString", OptionArg::BorrowString),
+        ("AsRef", OptionArg::AsRef),
+        ("IntoInner", OptionArg::IntoInner),
+        ("New", OptionArg::New),
+        ("AsStr", OptionArg::AsStr),
+    ]
+    .into_iter()
+    .flat_map(|(s, a)| vec![(s.to_string(), (a, false)), (format!("No{}", s), (a, true))])
+    .collect::<HashMap<_, _>>()
+});
+
+struct NegatableOptionArg {
+    option: OptionArg,
+    negated: bool,
+    span: Span,
+}
+
+impl NegatableOptionArg {
+    fn new(option: OptionArg, negated: bool, span: Span) -> NegatableOptionArg {
+        NegatableOptionArg {
+            option,
+            negated,
+            span,
+        }
+    }
+
+    fn apply(&self, options: &mut Options) {
+        match self.option {
+            OptionArg::Defaults => todo!(),
+            OptionArg::Clone => options.clone = Some(!self.negated),
+            OptionArg::Hash => options.hash = Some(!self.negated),
+            OptionArg::Eq => options.eq = Some(!self.negated),
+            OptionArg::PartialEq => options.partial_eq = Some(!self.negated),
+            OptionArg::Ord => options.ord = Some(!self.negated),
+            OptionArg::PartialOrd => options.partial_ord = Some(!self.negated),
+            OptionArg::Display => options.display = Some(!self.negated),
+            OptionArg::ToString => options.to_string = Some(!self.negated),
+            OptionArg::Debug => options.debug = Some(!self.negated),
+            OptionArg::AsBytes => options.as_bytes = Some(!self.negated),
+            OptionArg::BorrowString => options.borrow_string = Some(!self.negated),
+            OptionArg::AsRef => options.as_ref = Some(!self.negated),
+            OptionArg::IntoInner => options.into_inner = Some(!self.negated),
+            OptionArg::New => options.new = Some(!self.negated),
+            OptionArg::AsStr => options.as_str = Some(!self.negated),
+        }
+    }
+}
+
+fn parse_arg(segment: &PathSegment) -> syn::Result<NegatableOptionArg> {
+    let span = segment.span();
+    let s = segment.ident.to_string();
+    match OPTION_NAMES.get(&s) {
+        Some((option, negated)) => Ok(NegatableOptionArg::new(*option, *negated, span)),
+        None => Err(syn::Error::new(span, format!("Unknown option: {}", s))),
+    }
+}
+
+fn parse_args_path(path: &Path, span: Span) -> syn::Result<NegatableOptionArg> {
+    if path.segments.len() != 1 {
+        Err(syn::Error::new(span, ""))
+    } else {
+        let segment = path.segments.first().expect("No first segment");
+        parse_arg(segment)
+    }
+}
+
+fn parse_args_parts(args: &syn::AttributeArgs) -> syn::Result<Vec<NegatableOptionArg>> {
+    args.iter()
+        .map(|nested_meta| match nested_meta {
+            syn::NestedMeta::Meta(meta) => match meta {
+                syn::Meta::Path(p) => parse_args_path(p, meta.span()),
+                syn::Meta::List(_) => Err(syn::Error::new(nested_meta.span(), "list")),
+                syn::Meta::NameValue(_) => Err(syn::Error::new(nested_meta.span(), "kv")),
+            },
+            syn::NestedMeta::Lit(_) => Err(syn::Error::new(nested_meta.span(), "lit")),
+        })
+        .collect()
+}
+
+pub fn parse(attr_ast: &syn::AttributeArgs) -> syn::Result<Options> {
+    let mut options = Options::default();
+
+    let parts = parse_args_parts(attr_ast)?;
+
+    for part in parts {
+        part.apply(&mut options);
+    }
+
+    Ok(options)
 }
