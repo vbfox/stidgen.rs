@@ -49,12 +49,11 @@ enum TypeInfoError {
 
 impl Spanned for TypeInfoError {
     fn span(&self) -> Span {
-        match self {
-            TypeInfoError::NamedFields { span, .. } => span,
-            TypeInfoError::UnitFields { span, .. } => span,
-            TypeInfoError::InvalidFieldCount { span, .. } => span,
+        *match self {
+            TypeInfoError::NamedFields { span, .. }
+            | TypeInfoError::UnitFields { span, .. }
+            | TypeInfoError::InvalidFieldCount { span, .. } => span,
         }
-        .clone()
     }
 }
 
