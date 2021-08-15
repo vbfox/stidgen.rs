@@ -28,6 +28,8 @@ jobs:
           components: clippy
       - name: Check
         run: cargo clippy --all-targets --all-features -- -D warnings
+      - name: Install cargo-expand (for macrotest)
+        run: cargo install cargo-expand
       - name: Run tests
         run: cargo test --verbose
 
