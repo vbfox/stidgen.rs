@@ -15,6 +15,7 @@ jobs:
       matrix:
         rust:
           - stable
+          - nightly
     runs-on: ubuntu-latest
 
     steps:
@@ -28,10 +29,14 @@ jobs:
           components: clippy
       - name: Check
         run: cargo clippy --all-targets --all-features -- -D warnings
-      - name: Install cargo-expand (for macrotest)
-        run: cargo install cargo-expand
       - name: Run tests
         run: cargo test --verbose
+      - name: Install cargo-expand
+        run: cargo install cargo-expand
+        if: ${{ matrix.rust == 'nightly' }}
+      - name: Run  macrotest
+        run: cargo test --test macrotest
+        if: ${{ matrix.rust == 'nightly' }}
 
   build:
     strategy:
