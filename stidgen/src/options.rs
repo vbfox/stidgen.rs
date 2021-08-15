@@ -239,7 +239,7 @@ pub mod tests {
     use super::Options;
 
     fn parse_for_tests(token_stream: TokenStream) -> syn::Result<Options> {
-        let (attr_ast, _) = crate::tests::parse_for_tests(token_stream);
+        let (attr_ast, _) = crate::tests::parse(token_stream);
         super::parse(&attr_ast)
     }
 

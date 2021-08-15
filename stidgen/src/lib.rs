@@ -207,16 +207,20 @@ pub fn id(attr: TokenStream, item: TokenStream) -> TokenStream {
 
 #[cfg(test)]
 pub mod tests {
-    use super::*;
+    use crate::IdTypeInfo;
+    use proc_macro2::TokenStream;
+    use quote::quote;
 
-    pub fn parse_for_tests(token_stream: TokenStream2) -> (syn::AttributeArgs, syn::ItemStruct) {
+    #[must_use]
+    #[allow(clippy::missing_panics_doc)]
+    pub fn parse(token_stream: TokenStream) -> (syn::AttributeArgs, syn::ItemStruct) {
         let item_ast: syn::ItemStruct = syn::parse2(token_stream).unwrap();
         let attribute_meta = item_ast.attrs.get(0).unwrap().parse_meta().unwrap();
 
         let attr_ast = match attribute_meta {
             syn::Meta::List(meta_list) => meta_list.nested.into_iter().collect::<Vec<_>>(),
             syn::Meta::Path(_) => vec![],
-            _ => panic!("Unknown attribute structure"),
+            syn::Meta::NameValue(_) => panic!("Unknown attribute structure"),
         };
 
         (attr_ast, item_ast)
@@ -224,7 +228,7 @@ pub mod tests {
 
     #[test]
     fn get_options_no_defaults() {
-        let (attr_ast, item_ast) = parse_for_tests(quote! {
+        let (attr_ast, item_ast) = parse(quote! {
             #[id(NoDefaults, Clone, PartialEq, PartialOrd)]
             pub struct Id(String);
         });
@@ -238,7 +242,7 @@ pub mod tests {
 
     #[test]
     fn get_options_defaults() {
-        let (attr_ast, item_ast) = parse_for_tests(quote! {
+        let (attr_ast, item_ast) = parse(quote! {
             #[id]
             pub struct Id(String);
         });
