@@ -50,8 +50,7 @@
     clippy::unwrap_used,
     clippy::use_debug,
     clippy::verbose_file_reads,
-    clippy::wildcard_enum_match_arm,
-    clippy::wrong_pub_self_convention
+    clippy::wildcard_enum_match_arm
 )]
 
 use stidgen::id;

@@ -234,10 +234,10 @@ pub mod tests {
         });
         let id_type = IdTypeInfo::new(&item_ast).unwrap();
         let resolved = super::get_options(&attr_ast, &id_type).unwrap();
-        assert_eq!(resolved.eq, false);
-        assert_eq!(resolved.clone, true);
-        assert_eq!(resolved.partial_eq, true);
-        assert_eq!(resolved.partial_ord, true);
+        assert!(!resolved.eq);
+        assert!(resolved.clone);
+        assert!(resolved.partial_eq);
+        assert!(resolved.partial_ord);
     }
 
     #[test]
@@ -248,9 +248,9 @@ pub mod tests {
         });
         let id_type = IdTypeInfo::new(&item_ast).unwrap();
         let resolved = super::get_options(&attr_ast, &id_type).unwrap();
-        assert_eq!(resolved.eq, true);
-        assert_eq!(resolved.clone, true);
-        assert_eq!(resolved.partial_eq, true);
-        assert_eq!(resolved.partial_ord, true);
+        assert!(resolved.eq);
+        assert!(resolved.clone);
+        assert!(resolved.partial_eq);
+        assert!(resolved.partial_ord);
     }
 }

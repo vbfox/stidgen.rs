@@ -249,9 +249,9 @@ pub mod tests {
             #[id]
             pub struct Id(String);
         });
-        assert_eq!(r.is_ok(), true);
+        assert!(r.is_ok());
         let value = r.unwrap();
-        assert_eq!(value.apply_defaults, true);
+        assert!(value.apply_defaults);
         assert_eq!(value.clone, None);
         assert_eq!(value.hash, None);
         assert_eq!(value.eq, None);
@@ -263,7 +263,7 @@ pub mod tests {
             #[id(XXX)]
             pub struct Id(String);
         });
-        assert_eq!(r.is_err(), true);
+        assert!(r.is_err());
     }
 
     #[test]
@@ -272,7 +272,7 @@ pub mod tests {
             #[id(Clone, Hash, NoEq)]
             pub struct Id(String);
         });
-        assert_eq!(r.is_ok(), true);
+        assert!(r.is_ok());
         let value = r.unwrap();
         assert_eq!(value.clone, Some(true));
         assert_eq!(value.hash, Some(true));
