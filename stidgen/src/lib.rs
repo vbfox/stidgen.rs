@@ -6,7 +6,6 @@ extern crate proc_macro;
 /*
 
 TODO:
-- Do the option parsing
 - to_string should be separate from Display user-side too
 
 */
@@ -204,4 +203,50 @@ pub fn id(attr: TokenStream, item: TokenStream) -> TokenStream {
     impl_id_type(&attr_ast, &item_ast)
         .unwrap_or_else(|err| err.to_compile_error())
         .into()
+}
+
+#[cfg(test)]
+pub mod tests {
+    use super::*;
+
+    pub fn parse_for_tests(token_stream: TokenStream2) -> (syn::AttributeArgs, syn::ItemStruct) {
+        let item_ast: syn::ItemStruct = syn::parse2(token_stream).unwrap();
+        let attribute_meta = item_ast.attrs.get(0).unwrap().parse_meta().unwrap();
+
+        let attr_ast = match attribute_meta {
+            syn::Meta::List(meta_list) => meta_list.nested.into_iter().collect::<Vec<_>>(),
+            syn::Meta::Path(_) => vec![],
+            _ => panic!("Unknown attribute structure"),
+        };
+
+        (attr_ast, item_ast)
+    }
+
+    #[test]
+    fn get_options_no_defaults() {
+        let (attr_ast, item_ast) = parse_for_tests(quote! {
+            #[id(NoDefaults, Clone, PartialEq, PartialOrd)]
+            pub struct Id(String);
+        });
+        let id_type = IdTypeInfo::new(&item_ast).unwrap();
+        let resolved = super::get_options(&attr_ast, &id_type).unwrap();
+        assert_eq!(resolved.eq, false);
+        assert_eq!(resolved.clone, true);
+        assert_eq!(resolved.partial_eq, true);
+        assert_eq!(resolved.partial_ord, true);
+    }
+
+    #[test]
+    fn get_options_defaults() {
+        let (attr_ast, item_ast) = parse_for_tests(quote! {
+            #[id]
+            pub struct Id(String);
+        });
+        let id_type = IdTypeInfo::new(&item_ast).unwrap();
+        let resolved = super::get_options(&attr_ast, &id_type).unwrap();
+        assert_eq!(resolved.eq, true);
+        assert_eq!(resolved.clone, true);
+        assert_eq!(resolved.partial_eq, true);
+        assert_eq!(resolved.partial_ord, true);
+    }
 }

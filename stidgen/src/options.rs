@@ -154,7 +154,7 @@ static OPTION_NAMES: Lazy<HashMap<String, (OptionArg, bool)>> = Lazy::new(|| {
 struct NegatableOptionArg {
     option: OptionArg,
     negated: bool,
-    span: Span,
+    _span: Span,
 }
 
 impl NegatableOptionArg {
@@ -162,7 +162,7 @@ impl NegatableOptionArg {
         NegatableOptionArg {
             option,
             negated,
-            span,
+            _span: span,
         }
     }
 
@@ -198,11 +198,11 @@ fn parse_arg(segment: &PathSegment) -> syn::Result<NegatableOptionArg> {
 }
 
 fn parse_args_path(path: &Path, span: Span) -> syn::Result<NegatableOptionArg> {
-    if path.segments.len() != 1 {
-        Err(syn::Error::new(span, ""))
-    } else {
+    if path.segments.len() == 1 {
         let segment = path.segments.first().expect("No first segment");
         parse_arg(segment)
+    } else {
+        Err(syn::Error::new(span, ""))
     }
 }
 
@@ -229,4 +229,53 @@ pub fn parse(attr_ast: &syn::AttributeArgs) -> syn::Result<Options> {
     }
 
     Ok(options)
+}
+
+#[cfg(test)]
+pub mod tests {
+    use proc_macro2::TokenStream;
+    use quote::quote;
+
+    use super::Options;
+
+    fn parse_for_tests(token_stream: TokenStream) -> syn::Result<Options> {
+        let (attr_ast, _) = crate::tests::parse_for_tests(token_stream);
+        super::parse(&attr_ast)
+    }
+
+    #[test]
+    fn empty() {
+        let r = parse_for_tests(quote! {
+            #[id]
+            pub struct Id(String);
+        });
+        assert_eq!(r.is_ok(), true);
+        let value = r.unwrap();
+        assert_eq!(value.apply_defaults, true);
+        assert_eq!(value.clone, None);
+        assert_eq!(value.hash, None);
+        assert_eq!(value.eq, None);
+    }
+
+    #[test]
+    fn invalid_option() {
+        let r = parse_for_tests(quote! {
+            #[id(XXX)]
+            pub struct Id(String);
+        });
+        assert_eq!(r.is_err(), true);
+    }
+
+    #[test]
+    fn valid_options() {
+        let r = parse_for_tests(quote! {
+            #[id(Clone, Hash, NoEq)]
+            pub struct Id(String);
+        });
+        assert_eq!(r.is_ok(), true);
+        let value = r.unwrap();
+        assert_eq!(value.clone, Some(true));
+        assert_eq!(value.hash, Some(true));
+        assert_eq!(value.eq, Some(false));
+    }
 }
