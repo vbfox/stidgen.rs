@@ -28,7 +28,7 @@ jobs:
           components: clippy, rustfmt
       - name: Check
         if: ${{ matrix.rust == 'nightly' || matrix.rust == 'stable' }}
-        run: cargo clippy --all-targets --all-features -- -D warnings
+        run: cargo clippy --all-targets --all-features --tests --benches -- -Dclippy::all -Dclippy::pedantic
       - name: Run tests
         run: cargo test --verbose
       - name: Install cargo-expand

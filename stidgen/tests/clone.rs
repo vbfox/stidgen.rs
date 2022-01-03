@@ -13,6 +13,7 @@ fn clone_id() {
     #[id]
     struct FooId(String);
 
+    #[allow(clippy::needless_pass_by_value)]
     fn consume(id: FooId) {
         assert_eq!(id.as_str(), "bar");
     }
