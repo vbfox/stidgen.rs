@@ -3,6 +3,7 @@ name = "stidgen"
 version = "0.1.1"
 authors = ["Julien Roncaglia <julien@roncaglia.fr>"]
 edition = "2018"
+rust-version = "1.38"
 description = "Strongly Typed ID types macro"
 readme = "../Readme.md"
 homepage = "https://github.com/vbfox/stidgen.rs"

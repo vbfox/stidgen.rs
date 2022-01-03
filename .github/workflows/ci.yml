@@ -2,20 +2,19 @@ name: Rust
 
 on:
   push:
-    branches: [master]
   pull_request:
-    branches: [master]
+  schedule: [cron: "0 0 * * *"]
 
 env:
+  RUSTFLAGS: '-Dwarnings'
   CARGO_TERM_COLOR: always
 
 jobs:
   check:
     strategy:
+      fail-fast: false
       matrix:
-        rust:
-          - stable
-          - nightly
+        rust: [nightly, stable, 1.38.0]
     runs-on: ubuntu-latest
 
     steps:
