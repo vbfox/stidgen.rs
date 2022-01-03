@@ -1,4 +1,5 @@
 use stidgen::id;
+#[repr(transparent)]
 pub struct Id(String);
 #[automatically_derived]
 impl ::std::clone::Clone for Id {

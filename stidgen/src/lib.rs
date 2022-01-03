@@ -149,6 +149,8 @@ impl<'a> Stidgen<'a> {
         let as_str = add_impl_if_enabled!(options.as_str, impls::as_str(name));
 
         quote! {
+            #[repr(transparent)]
+
             #item_ast
 
             #new
