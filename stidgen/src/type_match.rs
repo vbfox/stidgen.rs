@@ -5,26 +5,19 @@ pub struct MatchableType {
     pub types: Vec<String>,
 }
 
-/// Get the type if it is a `Type::Path`, extract the `Type::Path` if wrapped in `Type::Paren`, `None` otherwise.
-fn try_get_path_type(ty: &Type) -> Option<&Type> {
-    match ty {
-        Type::Paren(paren) => try_get_path_type(&paren.elem),
-        Type::Path(_) => Some(ty),
-        _ => None,
-    }
-}
-
 impl MatchableType {
     pub fn new(parseable_types: Vec<&str>) -> MatchableType {
         #[cfg(debug_assertions)]
         {
+            use crate::known_types;
+
             let parsed_types = parseable_types
                 .iter()
                 .map(|t| syn::parse_str(t).expect("Hardcoded types should parse"))
                 .collect::<Vec<syn::Type>>();
 
             for ty in &parsed_types {
-                match try_get_path_type(ty) {
+                match known_types::try_get_path_type(ty) {
                     Some(_) => {}
                     None => panic!("Only Path types should be registered as known"),
                 }

@@ -145,7 +145,7 @@ static KNOWN_TYPE_INFOS: Lazy<Vec<KnownTypeInfo>> = Lazy::new(|| {
 });
 
 /// Get the type if it is a `Type::Path`, extract the `Type::Path` if wrapped in `Type::Paren`, `None` otherwise.
-fn try_get_path_type(ty: &Type) -> Option<&Type> {
+pub(crate) fn try_get_path_type(ty: &Type) -> Option<&Type> {
     match ty {
         Type::Paren(paren) => try_get_path_type(&paren.elem),
         Type::Path(_) => Some(ty),
