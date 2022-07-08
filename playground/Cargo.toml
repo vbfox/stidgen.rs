@@ -7,4 +7,4 @@ publish = false
 
 [dependencies]
 stidgen = { path = "../stidgen" }
-uuid = "0.8.2"
+uuid = "1.1.2"
